@@ -1779,11 +1779,25 @@ body::before {
   max-height: 400px; /* Limitamos la altura en escritorio */
 }
 
-/* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
-#muro-marco {
-  /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
-  max-width: 600px !important; 
-  /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
-  /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
+/* =========================================
+   AJUSTE DE COBERTURA: GALERÍA MURO
+   (Para eliminar espacios blancos y llenar el borde)
+   ========================================= */
+
+/* 1. Forzar a que la foto cubra 100% de su contenedor */
+#muro-track img {
+    /* La propiedad object-fit: cover es la clave para que la imagen cubra todo */
+    object-fit: cover !important; 
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    vertical-align: middle !important; /* Evita pequeños espacios extra debajo de la imagen */
 }
 
+/* 2. Asegurar que cada diapositiva (el contenedor de la foto) no tenga margen interno */
+#muro-track > div {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 100% !important;
+    height: 100% !important;
+}
