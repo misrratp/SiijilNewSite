@@ -190,7 +190,7 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (OPTIMIZADA PARA MÓVIL) ---
+// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
     if (btnPublicar) {
@@ -199,58 +199,56 @@ if (inputPostal) {
         
         if(!marco) return;
 
-        const textoOriginal = btnPublicar.innerHTML;
-        btnPublicar.innerHTML = '⏳ Preparando...';
+        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
+        btnPublicar.innerHTML = '✨ Renderizando HD...';
         btnPublicar.disabled = true;
 
         try {
-          // TRUCO PARA MÓVIL: Reducir la escala si es celular
-          // Si la pantalla es pequeña (móvil), usamos una calidad menor para no saturar la memoria
-          const esCelular = window.innerWidth < 768;
-          const escala = esCelular ? 0.8 : 1; // Bajamos un poco la calidad en cel
-
-          // A) Tomar foto al marco
-          // 'logging: true' nos ayuda a ver si falla en la consola (si está conectado)
-          const canvas = await html2canvas(marco, { 
-              scale: escala, 
-              useCORS: true,
-              allowTaint: true, // Ayuda con imágenes locales
-              logging: false 
-          });
+          // TRUCO DE CALIDAD:
+          // scale: 3 -> Significa que si el marco mide 300px, la foto saldrá de 900px (Super Nítida)
+          // Esto iguala la calidad de pantallas Retina/iPhone.
           
-          btnPublicar.innerHTML = '⏳ Subiendo...';
+          const canvas = await html2canvas(marco, { 
+              scale: 3,  // <--- AQUÍ ESTÁ LA CLAVE (Antes era 0.6 o 1)
+              useCORS: true, 
+              logging: false,
+              allowTaint: true,
+              backgroundColor: null,
+              imageTimeout: 0 // Esperar lo necesario a que cargue la imagen
+          });
 
-          // Bajamos la calidad del JPG a 0.6 (60%) para que suba rápido en datos móviles
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+          // Compresión suave (0.9 = 90% Calidad)
+          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
-          // B) Subir a Storage
-          const nombreArchivo = `postales/postal_${Date.now()}.jpg`;
+          btnPublicar.innerHTML = '☁️ Subiendo...';
+
+          // Subir a Storage
+          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
           const referenciaStorage = ref(storage, nombreArchivo);
+          
           await uploadString(referenciaStorage, imagenBase64, 'data_url');
           
-          // C) Obtener URL
+          // Guardar Datos
+          btnPublicar.innerHTML = '💾 Finalizando...';
           const urlPublica = await getDownloadURL(referenciaStorage);
 
-          // D) Guardar en Base de Datos
           await addDoc(collection(db, "muro_navideno"), {
             fotoUrl: urlPublica,
             fecha: new Date()
           });
 
-          alert("¡ÉXITO! Tu postal ya está en el muro 🎉");
+          alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
           cargarMuro(); 
 
         } catch (error) {
-          console.error("Error al subir:", error);
-          // Esta alerta te dirá exactamente qué pasó en el celular
-          alert("ERROR MÓVIL: " + error.message + "\n\nIntenta con una foto menos pesada.");
+          console.error("Error:", error);
+          alert("Error al subir: " + error.message);
         } finally {
           btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;
         }
       });
     }
-
 
 /* --------------------------------------------------------------
    7. REPRODUCTOR DE MÚSICA
