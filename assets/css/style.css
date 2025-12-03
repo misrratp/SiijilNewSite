@@ -1780,29 +1780,29 @@ body::before {
 }
 
 /* =========================================
-   AJUSTES DEFINITIVOS: COBERTURA Y TAMAÑO
+   AJUSTE DE COBERTURA: POSTAL NAVIDEÑA
+   (Asegura que la imagen sea GRANDE y cubra el marco)
    ========================================= */
 
-/* 1. Forzar el marco a ser grande y blanco */
-#muro-marco {
-    max-width: 760px !important; /* Asegura el nuevo tamaño */
-    background: var(--white) !important; /* Elimina el gris que se colaba */
+.marco-borde {
+    /* Eliminamos el padding si es que lo tenía el marco directamente, para que la foto toque el borde */
+    padding: 0 !important;
+    background: white !important; /* Asegurar que el fondo es blanco si se ve un gris feo */
 }
 
-/* 2. La imagen: Ocupa el 100% y se recorta si es necesario */
-#muro-track img {
-    /* La clave: asegura que el espacio se llene, sin dejar áreas vacías. */
+.marco-borde img {
+    /* 1. MODO COVER: Ocupa todo el espacio, aunque recorte los extremos */
     object-fit: cover !important; 
+    
+    /* 2. Aseguramos el 100% de alto y ancho */
     width: 100% !important;
     height: 100% !important;
-    display: block !important;
-    vertical-align: middle !important; 
+    
+    /* 3. Quitamos el min-height que podía causar espacios extra */
+    min-height: unset !important;
+    
+    /* 4. Asegurar que la imagen elimine los 15px de padding que se le pusieron al marco */
+    border-radius: 10px !important; 
 }
 
-/* 3. Los contenedores de las diapositivas: Eliminar cualquier relleno o margen */
-#muro-track > div {
-    padding: 0 !important;
-    margin: 0 !important;
-    min-width: 100% !important;
-    height: 100% !important;
-}
+/* Nota: El texto sobrepuesto debe estar bien posicionado (ya lo está en el JS) */
