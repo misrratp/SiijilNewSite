@@ -7,7 +7,27 @@
  */
 
 
+/* =========================================
+   ARREGLO URGENTE: EL MENÚ ENCIMA DE TODO
+   ========================================= */
 
+.header {
+  position: relative; 
+  /* Ponemos un número exageradamente alto para ganarle a la nieve (9999) y a la barra (10000) */
+  z-index: 30000 !important; 
+}
+
+/* Aseguramos que el botón de menú sea tocable */
+.nav-open-btn {
+  position: relative;
+  z-index: 30001 !important;
+  cursor: pointer;
+}
+
+/* Aseguramos que el menú desplegado esté AÚN más arriba */
+.navbar, .navbar.active {
+  z-index: 30002 !important;
+}
 
 
 /*-----------------------------------*\

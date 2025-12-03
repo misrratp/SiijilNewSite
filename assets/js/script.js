@@ -1,43 +1,24 @@
-/* ==========================================
-   LÓGICA DEL MENÚ MÓVIL (FUNDAMENTAL)
-   ========================================== */
-
-// 1. Seleccionamos los elementos del HTML
+/* INICIO DE SCRIPT.JS */
+const navOpenBtn = document.querySelector("[data-nav-open-btn]");
+const navbar = document.querySelector("[data-navbar]");
+const navCloseBtn = document.querySelector("[data-nav-close-btn]");
 const overlay = document.querySelector("[data-overlay]");
-const navOpenBtn = document.querySelector("[data-nav-open-btn]"); // El botón de 3 rayitas
-const navbar = document.querySelector("[data-navbar]");           // El menú lateral
-const navCloseBtn = document.querySelector("[data-nav-close-btn]"); // La X
-const navLinks = document.querySelectorAll("[data-nav-link]");    // Los enlaces (Inicio, etc.)
 
 const navElemArr = [navOpenBtn, navCloseBtn, overlay];
 
-// 2. Función para abrir/cerrar
 const navToggleEvent = function (elem) {
   for (let i = 0; i < elem.length; i++) {
-    if(elem[i]){
+    if(elem[i]) {
         elem[i].addEventListener("click", function () {
           navbar.classList.toggle("active");
           overlay.classList.toggle("active");
-          document.body.classList.toggle("active"); // Bloquear scroll
+          document.body.classList.toggle("active");
         });
     }
   }
 }
 
-// 3. Activar los botones si existen
-if(navOpenBtn && navbar) {
-    navToggleEvent(navElemArr);
-}
-
-// 4. Cerrar menú al dar clic en un enlace (para que no estorbe)
-for (let i = 0; i < navLinks.length; i++) {
-  navLinks[i].addEventListener("click", function () {
-    navbar.classList.remove("active");
-    overlay.classList.remove("active");
-    document.body.classList.remove("active");
-  });
-}
-
+if (navOpenBtn && navbar) { navToggleEvent(navElemArr); }
 
 
 
