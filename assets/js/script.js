@@ -1,10 +1,39 @@
-elem[i].addEventListener("click", function () {
-  navbar.classList.toggle("active");
-  overlay.classList.toggle("active");
-  document.body.classList.toggle("active");
-});
+/* ==========================================
+   LÓGICA DEL MENÚ MÓVIL
+   ========================================== */
+const overlay = document.querySelector("[data-overlay]");
+const navOpenBtn = document.querySelector("[data-nav-open-btn]");
+const navbar = document.querySelector("[data-navbar]");
+const navCloseBtn = document.querySelector("[data-nav-close-btn]");
+const navLinks = document.querySelectorAll("[data-nav-link]");
 
+const navElemArr = [navOpenBtn, navCloseBtn, overlay];
 
+const navToggleEvent = function (elem) {
+  for (let i = 0; i < elem.length; i++) {
+    if(elem[i]){
+        elem[i].addEventListener("click", function () {
+          // Activamos la clase en el HTML
+          navbar.classList.toggle("active");
+          overlay.classList.toggle("active");
+          document.body.classList.toggle("active");
+        });
+    }
+  }
+}
+
+if(navOpenBtn && navbar) {
+    navToggleEvent(navElemArr);
+}
+
+// Cerrar al dar clic en un enlace
+for (let i = 0; i < navLinks.length; i++) {
+  navLinks[i].addEventListener("click", function () {
+    navbar.classList.remove("active");
+    overlay.classList.remove("active");
+    document.body.classList.remove("active");
+  });
+}
 
 
 
