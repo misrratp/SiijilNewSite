@@ -233,3 +233,14 @@ window.toggleMusic = function() {
       });
   }
 }
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Permitir la lectura y escritura PÚBLICA por 30 días para fines de prueba
+      // (Esta es la configuración de modo de prueba)
+      allow read, write: if request.time < timestamp.date(2026, 1, 2);
+    }
+  }
+}
