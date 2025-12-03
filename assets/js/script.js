@@ -190,66 +190,31 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (OPTIMIZADA PARA MÓVIL) ---
-    const btnPublicar = document.getElementById('btn-publicar');
-    
-    if (btnPublicar) {
-      btnPublicar.addEventListener('click', async () => {
-        const marco = document.querySelector('.marco-borde');
-        
-        if(!marco) return;
+window.borrarFoto = function() {
+  // Regresar al logo local si borran
+  if (imgVistaPrevia) imgVistaPrevia.src = "./assets/images/logo.svg"; 
+  if (inputPostal) inputPostal.value = ""; 
+}
 
-        const textoOriginal = btnPublicar.innerHTML;
-        btnPublicar.innerHTML = '⏳ Preparando...';
-        btnPublicar.disabled = true;
+window.descargarPostal = function() {
+  const marco = document.querySelector('.marco-borde');
+  if (!marco || typeof html2canvas === 'undefined') {
+    console.error("Falta html2canvas");
+    return;
+  }
+  
+  const btn = document.querySelector('.btn-descargar');
+  const textoOriginal = btn ? btn.innerHTML : "Descargar";
+  if(btn) btn.innerHTML = '⏳ ...';
 
-        try {
-          // TRUCO PARA MÓVIL: Reducir la escala si es celular
-          // Si la pantalla es pequeña (móvil), usamos una calidad menor para no saturar la memoria
-          const esCelular = window.innerWidth < 768;
-          const escala = esCelular ? 0.8 : 1; // Bajamos un poco la calidad en cel
-
-          // A) Tomar foto al marco
-          // 'logging: true' nos ayuda a ver si falla en la consola (si está conectado)
-          const canvas = await html2canvas(marco, { 
-              scale: escala, 
-              useCORS: true,
-              allowTaint: true, // Ayuda con imágenes locales
-              logging: false 
-          });
-          
-          btnPublicar.innerHTML = '⏳ Subiendo...';
-
-          // Bajamos la calidad del JPG a 0.6 (60%) para que suba rápido en datos móviles
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.6); 
-
-          // B) Subir a Storage
-          const nombreArchivo = `postales/postal_${Date.now()}.jpg`;
-          const referenciaStorage = ref(storage, nombreArchivo);
-          await uploadString(referenciaStorage, imagenBase64, 'data_url');
-          
-          // C) Obtener URL
-          const urlPublica = await getDownloadURL(referenciaStorage);
-
-          // D) Guardar en Base de Datos
-          await addDoc(collection(db, "muro_navideno"), {
-            fotoUrl: urlPublica,
-            fecha: new Date()
-          });
-
-          alert("¡ÉXITO! Tu postal ya está en el muro 🎉");
-          cargarMuro(); 
-
-        } catch (error) {
-          console.error("Error al subir:", error);
-          // Esta alerta te dirá exactamente qué pasó en el celular
-          alert("ERROR MÓVIL: " + error.message + "\n\nIntenta con una foto menos pesada.");
-        } finally {
-          btnPublicar.innerHTML = textoOriginal;
-          btnPublicar.disabled = false;
-        }
-      });
-    }
+  html2canvas(marco, { scale: 2, useCORS: true }).then(canvas => {
+    const enlace = document.createElement('a');
+    enlace.download = 'Mi-Postal-Siijil.png';
+    enlace.href = canvas.toDataURL('image/png');
+    enlace.click();
+    if(btn) btn.innerHTML = textoOriginal;
+  });
+}
 
 
 /* --------------------------------------------------------------
