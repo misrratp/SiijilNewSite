@@ -1750,6 +1750,22 @@ body::before {
 
 }
 
+
+
+
+/* EL MENU SIEMPRE ARRIBA */
+.header {
+  position: relative;
+  z-index: 20000 !important; 
+}
+.nav-open-btn {
+  position: relative;
+  z-index: 20001 !important;
+}
+.navbar {
+  z-index: 20002 !important;
+}
+
 /* =========================================
    AJUSTE DE CALIDAD Y PREVISUALIZACIÓN
    ========================================= */
@@ -1769,21 +1785,5 @@ body::before {
   max-width: 700px !important; 
   /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
   /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
-}
-
-
-
-
-/* EL MENU SIEMPRE ARRIBA */
-.header {
-  position: relative;
-  z-index: 20000 !important; 
-}
-.nav-open-btn {
-  position: relative;
-  z-index: 20001 !important;
-}
-.navbar {
-  z-index: 20002 !important;
 }
 
