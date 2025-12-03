@@ -1,4 +1,57 @@
 
+/* ==============================================================
+   1. LÓGICA DEL MENÚ MÓVIL (MENÚ DE EMERGENCIA INTEGRADO)
+   ============================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("Iniciando Menú desde script.js...");
+
+  const navOpenBtn = document.querySelector("[data-nav-open-btn]");
+  const navbar = document.querySelector("[data-navbar]");
+  const navCloseBtn = document.querySelector("[data-nav-close-btn]");
+  const overlay = document.querySelector("[data-overlay]");
+  const navLinks = document.querySelectorAll("[data-nav-link]");
+
+  function toggleNavbar() {
+    // Forzamos las clases
+    navbar.classList.toggle("active");
+    overlay.classList.toggle("active");
+    document.body.classList.toggle("active");
+  }
+
+  // Asignar clic al botón de abrir
+  if (navOpenBtn) {
+    navOpenBtn.onclick = function() {
+      toggleNavbar();
+    };
+  }
+
+  // Asignar clic al botón de cerrar
+  if (navCloseBtn) {
+    navCloseBtn.onclick = function() {
+      toggleNavbar();
+    };
+  }
+
+  // Asignar clic al fondo oscuro
+  if (overlay) {
+    overlay.onclick = function() {
+      toggleNavbar();
+    };
+  }
+
+  // Cerrar al dar clic en enlaces
+  navLinks.forEach(link => {
+    link.onclick = function() {
+      navbar.classList.remove("active");
+      overlay.classList.remove("active");
+      document.body.classList.remove("active");
+    };
+  });
+});
+
+/* ... AQUÍ SIGUE EL RESTO DE TU CÓDIGO (Carrito, Música, Firebase, etc.) ... */
+
+
 
 // Activar botones del menú
 if (navOpenBtn && navbar) {
@@ -261,54 +314,3 @@ window.toggleMusic = function() {
       });
   }
 }
-/* ==============================================================
-   1. LÓGICA DEL MENÚ MÓVIL (MENÚ DE EMERGENCIA INTEGRADO)
-   ============================================================== */
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("Iniciando Menú desde script.js...");
-
-  const navOpenBtn = document.querySelector("[data-nav-open-btn]");
-  const navbar = document.querySelector("[data-navbar]");
-  const navCloseBtn = document.querySelector("[data-nav-close-btn]");
-  const overlay = document.querySelector("[data-overlay]");
-  const navLinks = document.querySelectorAll("[data-nav-link]");
-
-  function toggleNavbar() {
-    // Forzamos las clases
-    navbar.classList.toggle("active");
-    overlay.classList.toggle("active");
-    document.body.classList.toggle("active");
-  }
-
-  // Asignar clic al botón de abrir
-  if (navOpenBtn) {
-    navOpenBtn.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Asignar clic al botón de cerrar
-  if (navCloseBtn) {
-    navCloseBtn.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Asignar clic al fondo oscuro
-  if (overlay) {
-    overlay.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Cerrar al dar clic en enlaces
-  navLinks.forEach(link => {
-    link.onclick = function() {
-      navbar.classList.remove("active");
-      overlay.classList.remove("active");
-      document.body.classList.remove("active");
-    };
-  });
-});
-
-/* ... AQUÍ SIGUE EL RESTO DE TU CÓDIGO (Carrito, Música, Firebase, etc.) ... */
