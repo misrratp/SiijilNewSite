@@ -1,3 +1,34 @@
+/*-----------------------------------*\
+ * #style.css
+\*-----------------------------------*/
+
+/**
+ * copyright 2022 codewithsadee
+ */
+
+
+/* =========================================
+   ARREGLO URGENTE: EL MENÚ ENCIMA DE TODO
+   ========================================= */
+
+.header {
+  position: relative; 
+  /* Ponemos un número exageradamente alto para ganarle a la nieve (9999) y a la barra (10000) */
+  z-index: 30000 !important; 
+}
+
+/* Aseguramos que el botón de menú sea tocable */
+.nav-open-btn {
+  position: relative;
+  z-index: 30001 !important;
+  cursor: pointer;
+}
+
+/* Aseguramos que el menú desplegado esté AÚN más arriba */
+.navbar, .navbar.active {
+  z-index: 30002 !important;
+}
+
 
 /*-----------------------------------*\
  * #CUSTOM PROPERTY
@@ -1632,48 +1663,21 @@ body::before {
   40%, 60% { transform: translate3d(4px, 0, 0) rotate(5deg); }
 }
 
-/* =========================================
-   ARREGLO FINAL: FORZAR MENÚ MÓVIL
-   ========================================= */
+/* =======================================================
+   ARREGLO DEL MENÚ MÓVIL (LOGO Y TACHA)
+   ======================================================= */
 
-@media (max-width: 991px) {
+/* -------------------------------------------------------
+   1. EN COMPUTADORA (Pantallas grandes)
+   ¡Ocultamos esa barra por completo!
+   ------------------------------------------------------- */
+@media (min-width: 992px) {
+  .navbar-top {
+    display: none !important; /* Desaparece el contenedor del logo móvil y la tacha */
+  }
   
-  /* 1. EL MENÚ (Estado normal: Oculto) */
-  .navbar {
-    position: fixed !important;
-    top: 0 !important;
-    right: -320px !important; /* Escondido a la derecha */
-    width: 300px !important;
-    height: 100vh !important; /* Toda la altura */
-    background: #ffffff !important;
-    z-index: 9999999 !important; /* Encima de TODO */
-    transition: 0.4s ease !important; /* Animación suave */
-    visibility: visible !important;
-    display: block !important;
-    box-shadow: -5px 0 20px rgba(0,0,0,0.1);
-    overflow-y: auto; /* Permitir scroll si el menú es muy largo */
-  }
-
-  /* 2. EL MENÚ (Estado ACTIVADO: Visible) */
-  .navbar.active {
-    right: 0 !important; /* ¡Entra a la pantalla! */
-    transform: translateX(0) !important;
-  }
-
-  /* 3. EL FONDO OSCURO (Overlay) */
-  .overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    background: rgba(0,0,0,0.8) !important;
-    z-index: 9999998 !important; /* Justo debajo del menú */
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: 0.4s ease !important;
-  }
-
-  .overlay.active {
-    opacity: 1 !important;
-    pointer-events: all !important;
+  .nav-close-btn {
+    display: none !important; /* Aseguramos que el botón X tampoco salga */
   }
 }
 

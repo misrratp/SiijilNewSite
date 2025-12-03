@@ -1,18 +1,14 @@
-/* ==========================================
-   LÓGICA DEL MENÚ MÓVIL
-   ========================================== */
-const overlay = document.querySelector("[data-overlay]");
+/* INICIO DE SCRIPT.JS */
 const navOpenBtn = document.querySelector("[data-nav-open-btn]");
 const navbar = document.querySelector("[data-navbar]");
 const navCloseBtn = document.querySelector("[data-nav-close-btn]");
-const navLinks = document.querySelectorAll("[data-nav-link]");
+const overlay = document.querySelector("[data-overlay]");
 
 const navElemArr = [navOpenBtn, navCloseBtn, overlay];
 
 const navToggleEvent = function (elem) {
   for (let i = 0; i < elem.length; i++) {
-    // Verificamos que el elemento exista antes de agregar el evento
-    if(elem[i]){
+    if(elem[i]) {
         elem[i].addEventListener("click", function () {
           navbar.classList.toggle("active");
           overlay.classList.toggle("active");
@@ -22,27 +18,21 @@ const navToggleEvent = function (elem) {
   }
 }
 
-// Activar solo si los botones existen en el HTML
-if(navOpenBtn && navbar) {
-    navToggleEvent(navElemArr);
-}
+if (navOpenBtn && navbar) { navToggleEvent(navElemArr); }
 
-// Cerrar al dar clic en enlaces
-for (let i = 0; i < navLinks.length; i++) {
-  navLinks[i].addEventListener("click", function () {
-    navbar.classList.remove("active");
-    overlay.classList.remove("active");
-    document.body.classList.remove("active");
-  });
-}
+
+
+
+
 
 
 /* ==============================================================
-   2. TIENDA Y CARRITO DE COMPRAS (Sin cambios)
+   2. TIENDA Y CARRITO DE COMPRAS
    ============================================================== */
 let carrito = [];
 let total = 0;
 
+// Hacer funciones globales (window.) para que el HTML pueda usarlas
 window.agregarAlCarrito = function(producto, precio) {
   carrito.push({ producto, precio });
   total += precio;
@@ -116,7 +106,10 @@ window.procesarPago = function(event) {
 
 
 /* ==========================================
-   INTERACCIÓN: MASCOTA (Sin cambios)
+   INTERACCIÓN: MASCOTA MOLESTA (CON SONIDO DIRECTO)
+   ========================================== */
+/* ==========================================
+   INTERACCIÓN: MASCOTA (MÉTODO HTML ESTABLE)
    ========================================== */
 window.hacerEnojar = function() {
   const mascota = document.getElementById('mascota-img');
@@ -124,26 +117,30 @@ window.hacerEnojar = function() {
   
   if (!mascota) return;
 
+  // Si ya está enojada, no hacemos nada
   if (mascota.classList.contains('mascota-enojada')) return;
 
-  // INTENTAR SONIDO
+  // 1. INTENTAR SONIDO
   if (audio) {
     audio.volume = 1.0;
-    audio.currentTime = 0; 
+    audio.currentTime = 0; // Reiniciar por si le das clic seguido
+    
+    // Promesa para evitar errores si el navegador bloquea
     var promesa = audio.play();
     if (promesa !== undefined) {
         promesa.catch(error => {
             console.log("Error de audio:", error);
+            // Si falla, no pasa nada, solo no suena, pero no rompe la página
         });
     }
   } else {
-      // Si no existe el audio, no rompemos el código, solo seguimos
-      console.log("Audio no encontrado, solo animación.");
+      alert("Error: No encuentro la etiqueta <audio id='sonido-enojo'> en el HTML");
   }
 
-  // ANIMACIÓN
+  // 2. ANIMACIÓN
   mascota.classList.add('mascota-enojada');
 
+  // 3. QUITAR ENOJO
   setTimeout(() => {
     mascota.classList.remove('mascota-enojada');
   }, 500);
@@ -151,7 +148,7 @@ window.hacerEnojar = function() {
 
 
 /* ==============================================================
-   4. EFECTO DE NIEVE (Sin cambios)
+   4. EFECTO DE NIEVE
    ============================================================== */
 function createSnowflake() {
   const snowflake = document.createElement('div');
@@ -168,7 +165,7 @@ setInterval(createSnowflake, 200);
 
 
 /* ==============================================================
-   5. SLIDER AUTOMÁTICO DE NOVEDADES (Sin cambios)
+   5. SLIDER AUTOMÁTICO DE NOVEDADES
    ============================================================== */
 const trackNovedades = document.querySelector('.slider-track');
 const slidesNovedades = document.querySelectorAll('.slide');
@@ -184,11 +181,12 @@ if (slidesNovedades.length > 0) setInterval(moverSlider, 4000);
 
 
 /* ==============================================================
-   6. POSTAL NAVIDEÑA (Sin cambios)
+   6. POSTAL NAVIDEÑA (Generar Imagen)
    ============================================================== */
 const inputPostal = document.getElementById('input-postal');
 const imgVistaPrevia = document.getElementById('vista-previa-postal');
 
+// Subir foto al marco
 if (inputPostal) {
   inputPostal.addEventListener('change', function(event) {
     const archivo = event.target.files[0];
@@ -198,11 +196,13 @@ if (inputPostal) {
   });
 }
 
+// Borrar foto del marco
 window.borrarFoto = function() {
   if (imgVistaPrevia) imgVistaPrevia.src = "https://via.placeholder.com/600x400?text=Sube+Tu+Foto+Aquí";
   if (inputPostal) inputPostal.value = ""; 
 }
 
+// Descargar postal como imagen
 window.descargarPostal = function() {
   const marco = document.querySelector('.marco-borde');
   if (!marco || typeof html2canvas === 'undefined') {
@@ -210,6 +210,7 @@ window.descargarPostal = function() {
     return;
   }
   
+  // Cambiamos el texto del botón temporalmente
   const btn = document.querySelector('.btn-descargar');
   if(btn) btn.innerHTML = '<ion-icon name="hourglass-outline"></ion-icon> ...';
 
@@ -223,7 +224,7 @@ window.descargarPostal = function() {
 }
 
 /* ==========================================
-   REPRODUCTOR DE MÚSICA (Sin cambios)
+   REPRODUCTOR (Giro Inmediato + Volumen)
    ========================================== */
 let isPlaying = false;
 
@@ -235,19 +236,24 @@ window.toggleMusic = function() {
   if (!audio || !disco) return;
 
   if (isPlaying) {
+    // PAUSAR
     audio.pause();
     disco.classList.remove('disco-girando');
     texto.innerText = "🎵 SONIDO SELVA";
     texto.style.color = "white";
     isPlaying = false;
   } else {
-    // Giro visual inmediato
+    // REPRODUCIR
+    
+    // 1. Gira visualmente YA (sin esperar)
     disco.classList.add('disco-girando');
     texto.innerText = "⌛ CARGANDO...";
     texto.style.color = "#F8B229";
 
+    // 2. Ajustar Volumen (50%)
     audio.volume = 0.5;
 
+    // 3. Play al audio
     audio.play()
       .then(() => {
         texto.innerText = "🎶 REPRODUCIENDO...";
@@ -255,6 +261,7 @@ window.toggleMusic = function() {
       })
       .catch(error => {
         console.error(error);
+        // Si falla, deja de girar
         disco.classList.remove('disco-girando');
         texto.innerText = "❌ ERROR";
         texto.style.color = "red";
