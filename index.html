@@ -988,11 +988,11 @@
     </div>
   
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  
-<script src="./assets/js/script.js" type="module"></script>
+
+  <script src="./assets/js/script.js" type="module"></script>
 
   <script type="module">
-    // 1. Importar las funciones de Firebase desde internet
+     // 1. Importar las funciones de Firebase desde internet
    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
@@ -1149,6 +1149,57 @@
 
     // Ejecutar al inicio
     cargarMuro();
+  </script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("Iniciando Menú de Emergencia...");
+
+      const navOpenBtn = document.querySelector("[data-nav-open-btn]");
+      const navbar = document.querySelector("[data-navbar]");
+      const navCloseBtn = document.querySelector("[data-nav-close-btn]");
+      const overlay = document.querySelector("[data-overlay]");
+      const navLinks = document.querySelectorAll("[data-nav-link]");
+
+      function toggleNavbar() {
+        // Forzamos las clases
+        navbar.classList.toggle("active");
+        overlay.classList.toggle("active");
+        document.body.classList.toggle("active");
+      }
+
+      // Asignar clic al botón de abrir
+      if (navOpenBtn) {
+        navOpenBtn.onclick = function() {
+          toggleNavbar();
+        };
+      }
+
+      // Asignar clic al botón de cerrar
+      if (navCloseBtn) {
+        navCloseBtn.onclick = function() {
+          toggleNavbar();
+        };
+      }
+
+      // Asignar clic al fondo oscuro
+      if (overlay) {
+        overlay.onclick = function() {
+          toggleNavbar();
+        };
+      }
+
+      // Cerrar al dar clic en enlaces
+      navLinks.forEach(link => {
+        link.onclick = function() {
+          navbar.classList.remove("active");
+          overlay.classList.remove("active");
+          document.body.classList.remove("active");
+        };
+      });
+    });
+  </script>
+</body>
+</html>
 	
 	
 

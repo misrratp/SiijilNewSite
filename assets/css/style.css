@@ -11,28 +11,7 @@
    (Pega esto al final de style.css)
    ========================================= */
 
-/* 1. Subimos el encabezado por encima de la nieve (9999) */
-.header {
-  position: relative;
-  z-index: 20000 !important; 
-}
 
-/* 2. Aseguramos que el botón de las rayitas sea tocable */
-.nav-open-btn {
-  position: relative;
-  z-index: 20001 !important;
-  cursor: pointer;
-}
-
-/* 3. Aseguramos que el menú desplegado quede hasta arriba de todo */
-.navbar {
-  z-index: 20002 !important;
-}
-
-/* 4. Aseguramos que el fondo oscuro (overlay) tape la nieve */
-.overlay {
-  z-index: 20000 !important;
-}
 
 
 
@@ -1770,3 +1749,15 @@ body::before {
 
 }
 
+/* EL MENU SIEMPRE ARRIBA */
+.header {
+  position: relative;
+  z-index: 20000 !important; 
+}
+.nav-open-btn {
+  position: relative;
+  z-index: 20001 !important;
+}
+.navbar {
+  z-index: 20002 !important;
+}
