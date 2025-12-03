@@ -1782,7 +1782,7 @@ body::before {
 /* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
 #muro-marco {
   /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
-  max-width: 700px !important; 
+  max-width: 600px !important; 
   /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
   /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
 }
