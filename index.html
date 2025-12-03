@@ -999,13 +999,13 @@
 
   <script src="./assets/js/script.js" type="module"></script>
 
-<script type="module">
-    // 1. Importaciones (Necesarias para la ejecución)
+  <script type="module">
+    // 1. IMPORTACIONES
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    // 2. CONFIGURACIÓN (Tus datos)
+    // 2. TUS CLAVES (Las recuperé de tu archivo anterior)
     const firebaseConfig = {
       apiKey: "AIzaSyBlUMHKru7SUdvL7S9Ad6pqt5upGc-qCZE",
       authDomain: "siijil-navidad-fbd98.firebaseapp.com",
@@ -1015,69 +1015,145 @@
       appId: "1:943245186694:web:edcfb3365370077d2ee307"
     };
 
+    // 3. INICIALIZAR
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // --- VARIABLES GLOBALES DEL MURO ---
+    // --- VARIABLES GLOBALES ---
     let indiceMuro = 0;
     let intervaloMuro; 
 
-    // --- FUNCIÓN PUBLICAR FOTO (CON ELIMINACIÓN DE LEYENDA) ---
+    // --- FUNCIÓN 1: PUBLICAR FOTO (OPTIMIZADA PARA MÓVIL) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
     if (btnPublicar) {
       btnPublicar.addEventListener('click', async () => {
         const marco = document.querySelector('.marco-borde');
+        
         if(!marco) return;
 
-        // INICIO: El código que sube la foto (aquí debe estar el error 'ref is not defined')
+        // Guardamos el texto original del botón
+        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
+        
+        // PASO 1: AVISAR QUE EMPEZAMOS
+        btnPublicar.innerHTML = '⚙️ Procesando...';
+        btnPublicar.disabled = true;
+
         try {
-          const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
-          btnPublicar.innerHTML = '✨ Renderizando HD...';
-          btnPublicar.disabled = true;
-
+          // DETECTAR SI ES CELULAR
+          // Si la pantalla mide menos de 800px, asumimos que es celular
           const esCelular = window.innerWidth < 800;
-          const escala = esCelular ? 3 : 1.5; 
-
-          const canvas = await html2canvas(marco, { 
-              scale: escala, useCORS: true, logging: false, allowTaint: true, backgroundColor: null, imageTimeout: 0
-          });
           
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.95);
+          // CONFIGURACIÓN LIGERA
+          // En celular usamos escala 0.6 (baja calidad pero rápido)
+          // En compu usamos escala 1 (calidad normal)
+          const escala = esCelular ? 0.6 : 1;
 
-          // SUBIDA: Si el código es correcto, sube aquí.
+          // PASO 2: TOMAR LA FOTO (HTML2CANVAS)
+          const canvas = await html2canvas(marco, { 
+              scale: escala, 
+              useCORS: true, 
+              logging: false,
+              allowTaint: true,
+              backgroundColor: null
+          });
+
+          // Compresión agresiva para celular (0.5 = 50% calidad JPG)
+          const calidadJPG = esCelular ? 0.5 : 0.8;
+          const imagenBase64 = canvas.toDataURL('image/jpeg', calidadJPG);
+
+          // PASO 3: SUBIR A LA NUBE
           btnPublicar.innerHTML = '☁️ Subiendo...';
-          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
+          
+          const nombreArchivo = `postales/postal_${Date.now()}.jpg`;
           const referenciaStorage = ref(storage, nombreArchivo);
           
           await uploadString(referenciaStorage, imagenBase64, 'data_url');
           
-          // GUARDADO
+          // PASO 4: GUARDAR DATOS
+          btnPublicar.innerHTML = '💾 Guardando...';
           const urlPublica = await getDownloadURL(referenciaStorage);
+
           await addDoc(collection(db, "muro_navideno"), {
             fotoUrl: urlPublica,
             fecha: new Date()
           });
 
-          // ÉXITO: Actualizamos el botón y el muro
-          btnPublicar.innerHTML = '✅ Publicado';
+          alert("¡LISTO! Tu postal ya está en el muro 🎉");
           cargarMuro(); 
 
         } catch (error) {
-          // --- AQUÍ SILENCIAMOS EL ERROR ---
-          console.warn("Error silenciado. Causa:", error.message); 
-          
-          // Reiniciamos el botón para que el usuario pueda volver a intentarlo
-          btnPublicar.innerHTML = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
+          console.error("Error al subir:", error);
+          // Esta alerta te dirá exactamente qué pasó
+          alert("ERROR: " + error.message + "\n\n(Intenta con una foto menos pesada)");
+        } finally {
+          btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;
-        } 
+        }
       });
     }
 
     // --- FUNCIÓN 2: CARGAR MURO Y ANIMAR ---
-    async function cargarMuro() { /* ... (DEJA EL CÓDIGO QUE YA TIENES) ... */ }
-    function iniciarAnimacionMuro() { /* ... (DEJA EL CÓDIGO QUE YA TIENES) ... */ }
+    async function cargarMuro() {
+      const track = document.getElementById('muro-track'); 
+      const grid = document.getElementById('muro-contenedor');
+
+      if (!track && !grid) return;
+
+      const contenedor = track || grid;
+      const esCarrusel = !!track; 
+
+      contenedor.innerHTML = ''; 
+
+      // Pedimos las fotos
+      const q = query(collection(db, "muro_navideno"), orderBy("fecha", "desc"), limit(15));
+      const datos = await getDocs(q);
+
+      if (datos.empty) {
+        contenedor.innerHTML = '<div style="padding:20px; text-align:center;">¡Sé el primero en subir tu foto! 📸</div>';
+        return;
+      }
+
+      datos.forEach((doc) => {
+        const data = doc.data();
+        const elemento = document.createElement('div');
+        const borrarSiFalla = "this.parentElement.remove()";
+
+        if (esCarrusel) {
+            elemento.style.minWidth = "100%";
+            elemento.style.height = "100%";
+            elemento.style.position = "relative";
+            elemento.innerHTML = `
+              <img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="Foto" onerror="${borrarSiFalla}">
+              <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); color: white; padding: 5px; text-align: center;">🎄 Visitante ✨</div>
+            `;
+        } else {
+            elemento.style.cssText = "border-radius: 10px; overflow: hidden; border: 2px solid #D42426; height: 200px;";
+            elemento.innerHTML = `<img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="${borrarSiFalla}">`;
+        }
+        contenedor.appendChild(elemento);
+      });
+
+      if (esCarrusel) {
+          setTimeout(() => { iniciarAnimacionMuro(); }, 500);
+      }
+    }
+
+    function iniciarAnimacionMuro() {
+      if (intervaloMuro) clearInterval(intervaloMuro);
+      const track = document.getElementById('muro-track');
+      if(!track) return;
+      const totalSlides = track.children.length;
+      
+      intervaloMuro = setInterval(() => {
+        indiceMuro++;
+        if (indiceMuro >= totalSlides) indiceMuro = 0;
+        track.style.transform = `translateX(${indiceMuro * -100}%)`;
+      }, 3000);
+    }
+
+    // Ejecutar al inicio
     cargarMuro();
   </script>
 
