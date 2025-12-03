@@ -986,13 +986,15 @@
   
   
   
+<script src="./assets/js/script.js" type="module"></script>
+
   <script type="module">
     // 1. Importar las funciones de Firebase desde internet
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    // 2. TU CONFIGURACIÓN (REEMPLAZA ESTO CON TUS DATOS DE FIREBASE)
+    // 2. TU CONFIGURACIÓN
     const firebaseConfig = {
       apiKey: "AIzaSyBlUMHKru7SUdvL7S9Ad6pqt5upGc-qCZE",
       authDomain: "siijil-navidad-fbd98.firebaseapp.com",
@@ -1004,8 +1006,12 @@
 
     // 3. Inicializar Firebase
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app); // Base de datos
-    const storage = getStorage(app); // Almacenamiento de fotos
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // --- VARIABLES PARA EL SLIDER ---
+    let indiceMuro = 0;
+    let intervaloMuro; 
 
     // --- FUNCIÓN 1: PUBLICAR FOTO ---
     const btnPublicar = document.getElementById('btn-publicar');
@@ -1014,77 +1020,116 @@
       btnPublicar.addEventListener('click', async () => {
         const marco = document.querySelector('.marco-borde');
         
-        // Cambiar texto para avisar que está trabajando
+        if(!marco) return;
+
         const textoOriginal = btnPublicar.innerHTML;
         btnPublicar.innerHTML = '⏳ Subiendo...';
-        btnPublicar.disabled = true; // Evitar doble clic
+        btnPublicar.disabled = true;
 
         try {
-          // A) Tomar foto al marco (usando html2canvas)
+          // A) Tomar foto (html2canvas debe estar cargado antes en el HTML)
           const canvas = await html2canvas(marco, { scale: 1, useCORS: true });
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.8); // Calidad 80%
+          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.8);
 
-          // B) Crear nombre único para la foto
+          // B) Subir a Storage
           const nombreArchivo = `postales/postal_${Date.now()}.jpg`;
           const referenciaStorage = ref(storage, nombreArchivo);
-
-          // C) Subir la foto a la nube (Storage)
           await uploadString(referenciaStorage, imagenBase64, 'data_url');
           
-          // D) Obtener el link de descarga de esa foto
+          // C) Obtener URL
           const urlPublica = await getDownloadURL(referenciaStorage);
 
-          // E) Guardar el link en la Base de Datos (Firestore)
+          // D) Guardar en Base de Datos
           await addDoc(collection(db, "muro_navideno"), {
             fotoUrl: urlPublica,
-            fecha: new Date() // Guardamos la fecha para ordenar después
+            fecha: new Date()
           });
 
           alert("¡Tu postal está en el muro! 🎉");
-          cargarMuro(); // Recargar para ver la nueva foto
+          cargarMuro(); 
 
         } catch (error) {
           console.error("Error al subir:", error);
-          alert("Hubo un error al subir la foto. Revisa la consola.");
+          alert("Hubo un error al subir la foto. Revisa la consola (F12).");
         } finally {
-          // Restaurar botón
           btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;
         }
       });
     }
 
-    // --- FUNCIÓN 2: CARGAR MURO (VER FOTOS) ---
+    // --- FUNCIÓN 2: CARGAR MURO Y ANIMAR (CARRUSEL) ---
     async function cargarMuro() {
-      const contenedor = document.getElementById('muro-contenedor');
-      if (!contenedor) return;
+      // OJO: Asegúrate de que en tu HTML tengas el div con id="muro-track"
+      // Si usaste el código anterior que tenía "muro-contenedor", cámbialo aquí o en el HTML.
+      // Basado en lo último que hablamos (carrusel), debería ser 'muro-track'.
+      
+      const track = document.getElementById('muro-track'); 
+      // Si no existe el track (quizás tienes el grid viejo), intentamos buscar el contenedor viejo
+      const grid = document.getElementById('muro-contenedor');
 
-      contenedor.innerHTML = ''; // Limpiar antes de cargar
+      // Si no hay ni track ni grid, salimos
+      if (!track && !grid) return;
 
-      // Pedir las últimas 20 fotos
-      const q = query(collection(db, "muro_navideno"), orderBy("fecha", "desc"), limit(20));
+      // Definimos cuál usar (Prioridad al Carrusel 'track')
+      const contenedor = track || grid;
+      const esCarrusel = !!track; // Verdadero si existe el track
+
+      contenedor.innerHTML = ''; 
+
+      const q = query(collection(db, "muro_navideno"), orderBy("fecha", "desc"), limit(10));
       const datos = await getDocs(q);
+
+      if (datos.empty) {
+        contenedor.innerHTML = '<div style="padding:20px; text-align:center;">¡Sé el primero en subir tu foto! 📸</div>';
+        return;
+      }
 
       datos.forEach((doc) => {
         const data = doc.data();
         
-        // Crear la tarjetita de la foto
-        const tarjeta = document.createElement('div');
-        tarjeta.style.cssText = "border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid #D42426;";
+        const elemento = document.createElement('div');
         
-        tarjeta.innerHTML = `
-          <img src="${data.fotoUrl}" style="width: 100%; height: 200px; object-fit: cover; display: block;" alt="Postal de Visitante">
-        `;
+        if (esCarrusel) {
+            // Estilo para Carrusel (Slide)
+            elemento.style.minWidth = "100%";
+            elemento.style.height = "100%";
+            elemento.style.position = "relative";
+            elemento.innerHTML = `
+              <img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="Foto">
+              <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); color: white; padding: 5px; text-align: center;">🎄 Visitante ✨</div>
+            `;
+        } else {
+            // Estilo para Grid (Cuadritos)
+            elemento.style.cssText = "border-radius: 10px; overflow: hidden; border: 2px solid #D42426; height: 200px;";
+            elemento.innerHTML = `<img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        }
         
-        contenedor.appendChild(tarjeta);
+        contenedor.appendChild(elemento);
       });
+
+      if (esCarrusel) {
+          iniciarAnimacionMuro();
+      }
     }
 
-    // Cargar las fotos apenas entres a la página
+    function iniciarAnimacionMuro() {
+      if (intervaloMuro) clearInterval(intervaloMuro);
+      const track = document.getElementById('muro-track');
+      if(!track) return;
+
+      const totalSlides = track.children.length;
+      
+      intervaloMuro = setInterval(() => {
+        indiceMuro++;
+        if (indiceMuro >= totalSlides) indiceMuro = 0;
+        track.style.transform = `translateX(${indiceMuro * -100}%)`;
+      }, 3000);
+    }
+
     cargarMuro();
 
   </script>
-  
-</body>
 
+</body>
 </html>
