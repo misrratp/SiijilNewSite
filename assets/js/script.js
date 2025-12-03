@@ -1,12 +1,11 @@
 /* ==============================================================
-   SCRIPT PRINCIPAL - SÍIJIL NOH HÁ
+   SCRIPT PRINCIPAL - SÍIJIL NOH HÁ (ESTADO FINAL)
    ============================================================== */
 
 /* --------------------------------------------------------------
-   1. MENÚ MÓVIL (Lógica Blindada)
+   1. LÓGICA DEL MENÚ MÓVIL (Blindado)
    -------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  // Solo se ejecuta cuando el HTML ya cargó por completo
   const navOpenBtn = document.querySelector("[data-nav-open-btn]");
   const navbar = document.querySelector("[data-navbar]");
   const navCloseBtn = document.querySelector("[data-nav-close-btn]");
@@ -36,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /* --------------------------------------------------------------
-   2. TIENDA Y CARRITO
+   2. TIENDA Y CARRITO (Lógica)
    -------------------------------------------------------------- */
 let carrito = [];
 let total = 0;
@@ -73,7 +72,6 @@ window.finalizarCompraWhatsApp = function() {
   window.open(`https://wa.me/529838090970?text=${mensaje}`, '_blank');
 }
 
-/* Pasarela Falsa */
 window.abrirPasarela = function() {
   if (carrito.length === 0) { alert("Tu carrito está vacío."); return; }
   const modal = document.getElementById('modal-pago');
@@ -95,7 +93,7 @@ window.procesarPago = function(event) {
   const textoOriginal = btnPagar.innerText;
   
   btnPagar.innerText = "Procesando...";
-  btnPagar.style.backgroundColor = "#ccc";
+  btnPagar.backgroundColor = "#ccc";
   btnPagar.disabled = true;
 
   setTimeout(() => {
@@ -106,7 +104,7 @@ window.procesarPago = function(event) {
     window.cerrarPasarela();
     document.getElementById('carrito-flotante').style.display = 'none';
     btnPagar.innerText = textoOriginal;
-    btnPagar.style.backgroundColor = "";
+    btnPagar.backgroundColor = "";
     btnPagar.disabled = false;
     event.target.reset();
   }, 2000);
@@ -114,16 +112,18 @@ window.procesarPago = function(event) {
 
 
 /* --------------------------------------------------------------
-   3. MASCOTA INTERACTIVA
+   3. MASCOTA INTERACTIVA (Sonido y Animación)
    -------------------------------------------------------------- */
 window.hacerEnojar = function() {
   const mascota = document.getElementById('mascota-img');
   const audio = document.getElementById('sonido-enojo');
   
   if (!mascota) return;
+
+  // Si ya está enojada, no hacemos nada
   if (mascota.classList.contains('mascota-enojada')) return;
 
-  // Sonido
+  // 1. SONIDO
   if (audio) {
     audio.volume = 1.0;
     audio.currentTime = 0; 
@@ -133,8 +133,10 @@ window.hacerEnojar = function() {
     }
   }
 
-  // Animación
+  // 2. ANIMACIÓN
   mascota.classList.add('mascota-enojada');
+
+  // 3. QUITAR ENOJO
   setTimeout(() => {
     mascota.classList.remove('mascota-enojada');
   }, 500);
@@ -160,7 +162,7 @@ setInterval(createSnowflake, 200);
 
 
 /* --------------------------------------------------------------
-   5. SLIDER DE NOVEDADES
+   5. SLIDER AUTOMÁTICO DE NOVEDADES
    -------------------------------------------------------------- */
 const trackNovedades = document.querySelector('.slider-track');
 const slidesNovedades = document.querySelectorAll('.slide');
@@ -176,11 +178,12 @@ if (slidesNovedades.length > 0) setInterval(moverSlider, 4000);
 
 
 /* --------------------------------------------------------------
-   6. POSTAL NAVIDEÑA
+   6. POSTAL NAVIDEÑA (Lógica de subir y borrar)
    -------------------------------------------------------------- */
 const inputPostal = document.getElementById('input-postal');
 const imgVistaPrevia = document.getElementById('vista-previa-postal');
 
+// Subir foto al marco
 if (inputPostal) {
   inputPostal.addEventListener('change', function(event) {
     const archivo = event.target.files[0];
@@ -190,73 +193,36 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (MÁXIMA CALIDAD - ESCALA 3X) ---
-    const btnPublicar = document.getElementById('btn-publicar');
-    
-    if (btnPublicar) {
-      btnPublicar.addEventListener('click', async () => {
-        const marco = document.querySelector('.marco-borde');
-        
-        if(!marco) return;
+// Borrar foto del marco
+window.borrarFoto = function() {
+  if (imgVistaPrevia) imgVistaPrevia.src = "./assets/images/logo.svg"; 
+  if (inputPostal) inputPostal.value = ""; 
+}
 
-        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
-        btnPublicar.innerHTML = '✨ Renderizando 3X HD...';
-        btnPublicar.disabled = true;
+// Descargar postal como imagen
+window.descargarPostal = function() {
+  const marco = document.querySelector('.marco-borde');
+  if (!marco || typeof html2canvas === 'undefined') {
+    console.error("Falta html2canvas");
+    return;
+  }
+  
+  const btn = document.querySelector('.btn-descargar');
+  const textoOriginal = btn ? btn.innerHTML : "Descargar";
+  if(btn) btn.innerHTML = '⏳ ...';
 
-        try {
-          // DETECTAR DISPOSITIVO
-          const esCelular = window.innerWidth < 800;
-          
-          // AJUSTES DE CALIDAD MÁXIMA
-          // Usamos escala 3 para igualar la densidad de píxeles de los teléfonos más modernos.
-          const escala = esCelular ? 3 : 1.5; // 1.5x en escritorio ya es un buen HD.
+  html2canvas(marco, { scale: 2, useCORS: true }).then(canvas => {
+    const enlace = document.createElement('a');
+    enlace.download = 'Mi-Postal-Siijil.png';
+    enlace.href = canvas.toDataURL('image/png');
+    enlace.click();
+    if(btn) btn.innerHTML = textoOriginal;
+  });
+}
 
-          // 1. TOMAR FOTO CON HTML2CANVAS
-          const canvas = await html2canvas(marco, { 
-              scale: escala, // <--- LA SOLUCIÓN FINAL PARA LA NITIDEZ
-              useCORS: true, 
-              logging: false,
-              allowTaint: true,
-              backgroundColor: null,
-              imageTimeout: 0
-          });
-
-          // Compresión suave (0.95 para máxima calidad de color)
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-          btnPublicar.innerHTML = '☁️ Subiendo...';
-
-          // 2. SUBIR A STORAGE
-          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
-          const referenciaStorage = ref(storage, nombreArchivo);
-          
-          await uploadString(referenciaStorage, imagenBase64, 'data_url');
-          
-          // 3. GUARDAR DATOS
-          btnPublicar.innerHTML = '💾 Finalizando...';
-          const urlPublica = await getDownloadURL(referenciaStorage);
-
-          await addDoc(collection(db, "muro_navideno"), {
-            fotoUrl: urlPublica,
-            fecha: new Date()
-          });
-
-          alert("¡LISTO! La foto se subió en la mejor calidad posible 📸");
-          cargarMuro(); 
-
-        } catch (error) {
-          console.error("Error al subir:", error);
-          // Si falla, es por memoria. El código alerta al usuario.
-          alert("⚠️ ERROR: El navegador se quedó sin memoria (la foto original es muy pesada). Intenta con una foto más pequeña.");
-        } finally {
-          btnPublicar.innerHTML = textoOriginal;
-          btnPublicar.disabled = false;
-        }
-      });
-    }
 
 /* --------------------------------------------------------------
-   7. REPRODUCTOR DE MÚSICA
+   7. REPRODUCTOR DE MÚSICA (Toggle)
    -------------------------------------------------------------- */
 let isPlaying = false;
 
@@ -268,7 +234,7 @@ window.toggleMusic = function() {
   if (!audio || !disco) return;
 
   if (isPlaying) {
-    // PAUSA
+    // PAUSAR
     audio.pause();
     disco.classList.remove('disco-girando');
     texto.innerText = "🎵 SONIDO SELVA";
@@ -276,7 +242,6 @@ window.toggleMusic = function() {
     isPlaying = false;
   } else {
     // PLAY
-    // Giro visual inmediato
     disco.classList.add('disco-girando');
     texto.innerText = "⌛ CARGANDO...";
     texto.style.color = "#F8B229";
