@@ -6,7 +6,33 @@
  * copyright 2022 codewithsadee
  */
 
+/* =========================================
+   ARREGLO FINAL: MENÚ ENCIMA DE LA NIEVE
+   (Pega esto al final de style.css)
+   ========================================= */
 
+/* 1. Subimos el encabezado por encima de la nieve (9999) */
+.header {
+  position: relative;
+  z-index: 20000 !important; 
+}
+
+/* 2. Aseguramos que el botón de las rayitas sea tocable */
+.nav-open-btn {
+  position: relative;
+  z-index: 20001 !important;
+  cursor: pointer;
+}
+
+/* 3. Aseguramos que el menú desplegado quede hasta arriba de todo */
+.navbar {
+  z-index: 20002 !important;
+}
+
+/* 4. Aseguramos que el fondo oscuro (overlay) tape la nieve */
+.overlay {
+  z-index: 20000 !important;
+}
 
 
 
@@ -1744,42 +1770,3 @@ body::before {
 
 }
 
-/* =========================================
-   ARREGLO FINAL: QUE EL MENÚ FUNCIONE
-   (Poner el menú encima de la nieve)
-   ========================================= */
-
-/* 1. Subimos el encabezado por encima de la nieve (9999) y la barra (10000) */
-.header {
-  position: relative;
-  z-index: 20000 !important; 
-}
-
-/* 2. Aseguramos que el botón de las rayitas sea tocable */
-.nav-open-btn {
-  position: relative;
-  z-index: 20001 !important;
-  cursor: pointer;
-}
-
-/* 3. Aseguramos que el menú desplegado quede hasta arriba de todo */
-.navbar, .navbar.active {
-  z-index: 20002 !important;
-}
-
-/* 4. Aseguramos que el logo y la X se vean bien en celular */
-@media (max-width: 991px) {
-  .navbar-top {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 10px 15px !important;
-  }
-}
-
-/* 5. Aseguramos que NO salgan en computadora */
-@media (min-width: 992px) {
-  .navbar-top {
-    display: none !important;
-  }
-}
