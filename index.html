@@ -1048,7 +1048,7 @@
           // CONFIGURACIÓN LIGERA
           // En celular usamos escala 0.6 (baja calidad pero rápido)
           // En compu usamos escala 1 (calidad normal)
- const esCelular = window.innerWidth < 800;
+
           const escala = esCelular ? 3 : 1.5; 
           // PASO 2: TOMAR LA FOTO (HTML2CANVAS)
           const canvas = await html2canvas(marco, { 
