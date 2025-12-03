@@ -1,15 +1,22 @@
-/* INICIO DE SCRIPT.JS */
+/* ==========================================
+   LÓGICA DEL MENÚ MÓVIL (CON ALERTA DE PRUEBA)
+   ========================================== */
+const overlay = document.querySelector("[data-overlay]");
 const navOpenBtn = document.querySelector("[data-nav-open-btn]");
 const navbar = document.querySelector("[data-navbar]");
 const navCloseBtn = document.querySelector("[data-nav-close-btn]");
-const overlay = document.querySelector("[data-overlay]");
+const navLinks = document.querySelectorAll("[data-nav-link]");
 
 const navElemArr = [navOpenBtn, navCloseBtn, overlay];
 
 const navToggleEvent = function (elem) {
   for (let i = 0; i < elem.length; i++) {
-    if(elem[i]) {
+    if(elem[i]){
         elem[i].addEventListener("click", function () {
+          // --- ESTA ES LA PRUEBA ---
+          // Si ves esto en tu cel, el botón SÍ funciona
+          alert("¡Clic detectado! Abriendo menú..."); 
+          
           navbar.classList.toggle("active");
           overlay.classList.toggle("active");
           document.body.classList.toggle("active");
@@ -18,8 +25,9 @@ const navToggleEvent = function (elem) {
   }
 }
 
-if (navOpenBtn && navbar) { navToggleEvent(navElemArr); }
-
+if(navOpenBtn && navbar) {
+    navToggleEvent(navElemArr);
+}
 
 
 
