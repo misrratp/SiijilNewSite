@@ -112,136 +112,6 @@ window.procesarPago = function(event) {
   }, 2000);
 }
 
-/* ==============================================================
-   SCRIPT PRINCIPAL - SÍIJIL NOH HÁ (VERSIÓN FINAL CON FIREBASE)
-   ============================================================== */
-
-// 1. IMPORTACIONES DE FIREBASE (Necesarias para las funciones de abajo)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-// 2. CONFIGURACIÓN E INICIALIZACIÓN (Solo la parte de las variables)
-const firebaseConfig = {
-  apiKey: "AIzaSyBlUMHKru7SUdvL7S9Ad6pqt5upGc-qCZE",
-  authDomain: "siijil-navidad-fbd98.firebaseapp.com",
-  projectId: "siijil-navidad-fbd98",
-  storageBucket: "siijil-navidad-fbd98.firebasestorage.app",
-  messagingSenderId: "943245186694",
-  appId: "1:943245186694:web:edcfb3365370077d2ee307"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// --- VARIABLES GLOBALES DEL PROYECTO ---
-let carrito = [];
-let total = 0;
-let indiceMuro = 0;
-let intervaloMuro;
-
-
-/* --------------------------------------------------------------
-   3. MENÚ MÓVIL (Lógica que usa DOM)
-   -------------------------------------------------------------- */
-document.addEventListener('DOMContentLoaded', () => {
-  const navOpenBtn = document.querySelector("[data-nav-open-btn]");
-  const navbar = document.querySelector("[data-navbar]");
-  const navCloseBtn = document.querySelector("[data-nav-close-btn]");
-  const overlay = document.querySelector("[data-overlay]");
-  const navLinks = document.querySelectorAll("[data-nav-link]");
-
-  function toggleNavbar() {
-    navbar.classList.toggle("active");
-    overlay.classList.toggle("active");
-    document.body.classList.toggle("active");
-  }
-
-  // Asignar clics de forma segura
-  if (navOpenBtn) navOpenBtn.onclick = toggleNavbar;
-  if (navCloseBtn) navCloseBtn.onclick = toggleNavbar;
-  if (overlay) overlay.onclick = toggleNavbar;
-
-  // Cerrar menú al tocar un enlace
-  navLinks.forEach(link => {
-    link.onclick = function() {
-      navbar.classList.remove("active");
-      overlay.classList.remove("active");
-      document.body.classList.remove("active");
-    };
-  });
-});
-
-
-/* --------------------------------------------------------------
-   4. FUNCIÓN PUBLICAR FOTO (Usa Storage y Firestore)
-   -------------------------------------------------------------- */
-const btnPublicar = document.getElementById('btn-publicar');
-
-if (btnPublicar) {
-  btnPublicar.addEventListener('click', async () => {
-    const marco = document.querySelector('.marco-borde');
-    if(!marco) return;
-
-    const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
-    btnPublicar.innerHTML = '✨ Renderizando HD...';
-    btnPublicar.disabled = true;
-
-    try {
-      const esCelular = window.innerWidth < 800;
-      const escala = esCelular ? 3 : 1.5; 
-      
-      // PASO 1: TOMAR LA FOTO CON HTML2CANVAS
-      const canvas = await html2canvas(marco, { 
-          scale: escala, useCORS: true, logging: false, allowTaint: true, backgroundColor: null, imageTimeout: 0
-      });
-
-      const imagenBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-      // PASO 2: SUBIR A STORAGE (Aquí usaba la variable 'ref' que ahora sí está importada arriba)
-      btnPublicar.innerHTML = '☁️ Subiendo...';
-      const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
-      const referenciaStorage = ref(storage, nombreArchivo); // <--- ESTO AHORA FUNCIONA
-      await uploadString(referenciaStorage, imagenBase64, 'data_url');
-      
-      const urlPublica = await getDownloadURL(referenciaStorage);
-
-      // PASO 3: GUARDAR EN BASE DE DATOS
-      btnPublicar.innerHTML = '💾 Finalizando...';
-      await addDoc(collection(db, "muro_navideno"), {
-        fotoUrl: urlPublica,
-        fecha: new Date()
-      });
-
-      alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
-      cargarMuro(); 
-
-    } catch (error) {
-      console.error("Error al subir:", error);
-      alert("⚠️ ERROR: " + error.message + " (Problema de conexión o memoria).");
-    } finally {
-      btnPublicar.innerHTML = textoOriginal;
-      btnPublicar.disabled = false;
-    }
-  });
-}
-
-
-/* --------------------------------------------------------------
-   5. MÁS FUNCIONES (Carrito, Música, Nieve, Muro)
-   -------------------------------------------------------------- */
-// (El resto de tus funciones como cargarMuro, toggleMusic, hacerEnojar, etc., van aquí. 
-//  Asegúrate de copiar todas las que me mandaste anteriormente y ponerlas después de este bloque.)
-
-
-
-
-
-
-
-
-
 
 /* --------------------------------------------------------------
    3. MASCOTA INTERACTIVA
@@ -320,7 +190,65 @@ if (inputPostal) {
   });
 }
 
+// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD) ---
+    const btnPublicar = document.getElementById('btn-publicar');
+    
+    if (btnPublicar) {
+      btnPublicar.addEventListener('click', async () => {
+        const marco = document.querySelector('.marco-borde');
+        
+        if(!marco) return;
 
+        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
+        btnPublicar.innerHTML = '✨ Renderizando HD...';
+        btnPublicar.disabled = true;
+
+        try {
+          // TRUCO DE CALIDAD:
+          // scale: 3 -> Significa que si el marco mide 300px, la foto saldrá de 900px (Super Nítida)
+          // Esto iguala la calidad de pantallas Retina/iPhone.
+          
+          const canvas = await html2canvas(marco, { 
+              scale: 3,  // <--- AQUÍ ESTÁ LA CLAVE (Antes era 0.6 o 1)
+              useCORS: true, 
+              logging: false,
+              allowTaint: true,
+              backgroundColor: null,
+              imageTimeout: 0 // Esperar lo necesario a que cargue la imagen
+          });
+
+          // Compresión suave (0.9 = 90% Calidad)
+          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+          btnPublicar.innerHTML = '☁️ Subiendo...';
+
+          // Subir a Storage
+          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
+          const referenciaStorage = ref(storage, nombreArchivo);
+          
+          await uploadString(referenciaStorage, imagenBase64, 'data_url');
+          
+          // Guardar Datos
+          btnPublicar.innerHTML = '💾 Finalizando...';
+          const urlPublica = await getDownloadURL(referenciaStorage);
+
+          await addDoc(collection(db, "muro_navideno"), {
+            fotoUrl: urlPublica,
+            fecha: new Date()
+          });
+
+          alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
+          cargarMuro(); 
+
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error al subir: " + error.message);
+        } finally {
+          btnPublicar.innerHTML = textoOriginal;
+          btnPublicar.disabled = false;
+        }
+      });
+    }
 
 /* --------------------------------------------------------------
    7. REPRODUCTOR DE MÚSICA
