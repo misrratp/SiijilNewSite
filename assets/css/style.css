@@ -1779,30 +1779,11 @@ body::before {
   max-height: 400px; /* Limitamos la altura en escritorio */
 }
 
-/* =========================================
-   AJUSTE DE COBERTURA: POSTAL NAVIDEÑA
-   (Asegura que la imagen sea GRANDE y cubra el marco)
-   ========================================= */
-
-.marco-borde {
-    /* Eliminamos el padding si es que lo tenía el marco directamente, para que la foto toque el borde */
-    padding: 0 !important;
-    background: white !important; /* Asegurar que el fondo es blanco si se ve un gris feo */
+/* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
+#muro-marco {
+  /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
+  max-width: 600px !important; 
+  /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
+  /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
 }
 
-.marco-borde img {
-    /* 1. MODO COVER: Ocupa todo el espacio, aunque recorte los extremos */
-    object-fit: cover !important; 
-    
-    /* 2. Aseguramos el 100% de alto y ancho */
-    width: 100% !important;
-    height: 100% !important;
-    
-    /* 3. Quitamos el min-height que podía causar espacios extra */
-    min-height: unset !important;
-    
-    /* 4. Asegurar que la imagen elimine los 15px de padding que se le pusieron al marco */
-    border-radius: 10px !important; 
-}
-
-/* Nota: El texto sobrepuesto debe estar bien posicionado (ya lo está en el JS) */
