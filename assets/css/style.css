@@ -1779,22 +1779,11 @@ body::before {
   max-height: 400px; /* Limitamos la altura en escritorio */
 }
 
-/* AJUSTE DE ALTURA DEFINITIVO */
-#muro-track {
-    height: 100% !important; 
-    margin: 0 !important;
-    padding: 0 !important;
+/* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
+#muro-marco {
+  /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
+  max-width: 800px !important; 
+  /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
+  /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
 }
 
-#muro-track > div {
-    height: 100% !important; 
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-#muro-track img {
-    /* Ocupa todo el espacio, sin dejar huecos */
-    object-fit: cover !important; 
-    width: 100% !important;
-    height: 100% !important;
-}
