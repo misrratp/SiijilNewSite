@@ -208,8 +208,12 @@ if (inputPostal) {
 }
 
 // Borrar foto del marco
+// Borrar foto del marco
 window.borrarFoto = function() {
-  if (imgVistaPrevia) imgVistaPrevia.src = "https://via.placeholder.com/600x400?text=Sube+Tu+Foto+Aquí";
+  if (imgVistaPrevia) {
+    // Regresamos al logo local en lugar del link roto
+    imgVistaPrevia.src = "./assets/images/logo.svg"; 
+  }
   if (inputPostal) inputPostal.value = ""; 
 }
 
