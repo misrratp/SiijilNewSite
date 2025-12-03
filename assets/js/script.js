@@ -1,32 +1,34 @@
-/* ==========================================
-   LÓGICA DEL MENÚ MÓVIL
-   ========================================== */
-const overlay = document.querySelector("[data-overlay]");
+/* ==============================================================
+   1. LÓGICA DEL MENÚ MÓVIL (VERSIÓN ROBUSTA)
+   ============================================================== */
+// Seleccionamos los elementos
 const navOpenBtn = document.querySelector("[data-nav-open-btn]");
 const navbar = document.querySelector("[data-navbar]");
 const navCloseBtn = document.querySelector("[data-nav-close-btn]");
+const overlay = document.querySelector("[data-overlay]");
 const navLinks = document.querySelectorAll("[data-nav-link]");
 
-const navElemArr = [navOpenBtn, navCloseBtn, overlay];
-
-const navToggleEvent = function (elem) {
-  for (let i = 0; i < elem.length; i++) {
-    if(elem[i]){
-        elem[i].addEventListener("click", function () {
-          // Activamos la clase en el HTML
-          navbar.classList.toggle("active");
-          overlay.classList.toggle("active");
-          document.body.classList.toggle("active");
-        });
-    }
-  }
+// Función única para abrir/cerrar
+const toggleNav = function () {
+  navbar.classList.toggle("active");
+  overlay.classList.toggle("active");
+  document.body.classList.toggle("active");
 }
 
-if(navOpenBtn && navbar) {
-    navToggleEvent(navElemArr);
+// Asignamos los eventos DIRECTAMENTE (Más seguro que el array)
+if (navOpenBtn) {
+  navOpenBtn.addEventListener("click", toggleNav);
 }
 
-// Cerrar al dar clic en un enlace
+if (navCloseBtn) {
+  navCloseBtn.addEventListener("click", toggleNav);
+}
+
+if (overlay) {
+  overlay.addEventListener("click", toggleNav);
+}
+
+// Cerrar menú al dar clic en un enlace
 for (let i = 0; i < navLinks.length; i++) {
   navLinks[i].addEventListener("click", function () {
     navbar.classList.remove("active");
@@ -36,15 +38,12 @@ for (let i = 0; i < navLinks.length; i++) {
 }
 
 
-
-
 /* ==============================================================
-   2. TIENDA Y CARRITO DE COMPRAS
+   2. TIENDA Y CARRITO DE COMPRAS (Sin cambios)
    ============================================================== */
 let carrito = [];
 let total = 0;
 
-// Hacer funciones globales (window.) para que el HTML pueda usarlas
 window.agregarAlCarrito = function(producto, precio) {
   carrito.push({ producto, precio });
   total += precio;
@@ -118,10 +117,7 @@ window.procesarPago = function(event) {
 
 
 /* ==========================================
-   INTERACCIÓN: MASCOTA MOLESTA (CON SONIDO DIRECTO)
-   ========================================== */
-/* ==========================================
-   INTERACCIÓN: MASCOTA (MÉTODO HTML ESTABLE)
+   INTERACCIÓN: MASCOTA (Sin cambios)
    ========================================== */
 window.hacerEnojar = function() {
   const mascota = document.getElementById('mascota-img');
@@ -129,30 +125,26 @@ window.hacerEnojar = function() {
   
   if (!mascota) return;
 
-  // Si ya está enojada, no hacemos nada
   if (mascota.classList.contains('mascota-enojada')) return;
 
-  // 1. INTENTAR SONIDO
+  // INTENTAR SONIDO
   if (audio) {
     audio.volume = 1.0;
-    audio.currentTime = 0; // Reiniciar por si le das clic seguido
-    
-    // Promesa para evitar errores si el navegador bloquea
+    audio.currentTime = 0; 
     var promesa = audio.play();
     if (promesa !== undefined) {
         promesa.catch(error => {
             console.log("Error de audio:", error);
-            // Si falla, no pasa nada, solo no suena, pero no rompe la página
         });
     }
   } else {
-      alert("Error: No encuentro la etiqueta <audio id='sonido-enojo'> en el HTML");
+      // Si no existe el audio, no rompemos el código, solo seguimos
+      console.log("Audio no encontrado, solo animación.");
   }
 
-  // 2. ANIMACIÓN
+  // ANIMACIÓN
   mascota.classList.add('mascota-enojada');
 
-  // 3. QUITAR ENOJO
   setTimeout(() => {
     mascota.classList.remove('mascota-enojada');
   }, 500);
@@ -160,7 +152,7 @@ window.hacerEnojar = function() {
 
 
 /* ==============================================================
-   4. EFECTO DE NIEVE
+   4. EFECTO DE NIEVE (Sin cambios)
    ============================================================== */
 function createSnowflake() {
   const snowflake = document.createElement('div');
@@ -177,7 +169,7 @@ setInterval(createSnowflake, 200);
 
 
 /* ==============================================================
-   5. SLIDER AUTOMÁTICO DE NOVEDADES
+   5. SLIDER AUTOMÁTICO DE NOVEDADES (Sin cambios)
    ============================================================== */
 const trackNovedades = document.querySelector('.slider-track');
 const slidesNovedades = document.querySelectorAll('.slide');
@@ -193,12 +185,11 @@ if (slidesNovedades.length > 0) setInterval(moverSlider, 4000);
 
 
 /* ==============================================================
-   6. POSTAL NAVIDEÑA (Generar Imagen)
+   6. POSTAL NAVIDEÑA (Sin cambios)
    ============================================================== */
 const inputPostal = document.getElementById('input-postal');
 const imgVistaPrevia = document.getElementById('vista-previa-postal');
 
-// Subir foto al marco
 if (inputPostal) {
   inputPostal.addEventListener('change', function(event) {
     const archivo = event.target.files[0];
@@ -208,13 +199,11 @@ if (inputPostal) {
   });
 }
 
-// Borrar foto del marco
 window.borrarFoto = function() {
   if (imgVistaPrevia) imgVistaPrevia.src = "https://via.placeholder.com/600x400?text=Sube+Tu+Foto+Aquí";
   if (inputPostal) inputPostal.value = ""; 
 }
 
-// Descargar postal como imagen
 window.descargarPostal = function() {
   const marco = document.querySelector('.marco-borde');
   if (!marco || typeof html2canvas === 'undefined') {
@@ -222,7 +211,6 @@ window.descargarPostal = function() {
     return;
   }
   
-  // Cambiamos el texto del botón temporalmente
   const btn = document.querySelector('.btn-descargar');
   if(btn) btn.innerHTML = '<ion-icon name="hourglass-outline"></ion-icon> ...';
 
@@ -236,7 +224,7 @@ window.descargarPostal = function() {
 }
 
 /* ==========================================
-   REPRODUCTOR (Giro Inmediato + Volumen)
+   REPRODUCTOR DE MÚSICA (Sin cambios)
    ========================================== */
 let isPlaying = false;
 
@@ -248,24 +236,19 @@ window.toggleMusic = function() {
   if (!audio || !disco) return;
 
   if (isPlaying) {
-    // PAUSAR
     audio.pause();
     disco.classList.remove('disco-girando');
     texto.innerText = "🎵 SONIDO SELVA";
     texto.style.color = "white";
     isPlaying = false;
   } else {
-    // REPRODUCIR
-    
-    // 1. Gira visualmente YA (sin esperar)
+    // Giro visual inmediato
     disco.classList.add('disco-girando');
     texto.innerText = "⌛ CARGANDO...";
     texto.style.color = "#F8B229";
 
-    // 2. Ajustar Volumen (50%)
     audio.volume = 0.5;
 
-    // 3. Play al audio
     audio.play()
       .then(() => {
         texto.innerText = "🎶 REPRODUCIENDO...";
@@ -273,7 +256,6 @@ window.toggleMusic = function() {
       })
       .catch(error => {
         console.error(error);
-        // Si falla, deja de girar
         disco.classList.remove('disco-girando');
         texto.innerText = "❌ ERROR";
         texto.style.color = "red";
