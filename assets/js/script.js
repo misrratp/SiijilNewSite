@@ -190,6 +190,50 @@ if (inputPostal) {
   });
 }
 
+
+
+/* --------------------------------------------------------------
+   7. REPRODUCTOR DE MÚSICA
+   -------------------------------------------------------------- */
+let isPlaying = false;
+
+window.toggleMusic = function() {
+  const disco = document.getElementById('vinyl-disc');
+  const audio = document.getElementById('selva-audio');
+  const texto = document.getElementById('music-text');
+
+  if (!audio || !disco) return;
+
+  if (isPlaying) {
+    // PAUSA
+    audio.pause();
+    disco.classList.remove('disco-girando');
+    texto.innerText = "🎵 SONIDO SELVA";
+    texto.style.color = "white";
+    isPlaying = false;
+  } else {
+    // PLAY
+    // Giro visual inmediato
+    disco.classList.add('disco-girando');
+    texto.innerText = "⌛ CARGANDO...";
+    texto.style.color = "#F8B229";
+
+    audio.volume = 0.5;
+
+    audio.play()
+      .then(() => {
+        texto.innerText = "🎶 REPRODUCIENDO...";
+        isPlaying = true;
+      })
+      .catch(error => {
+        console.error(error);
+        disco.classList.remove('disco-girando');
+        texto.innerText = "❌ ERROR";
+        texto.style.color = "red";
+      });
+  }
+}
+
 // --- FUNCIÓN 1: PUBLICAR FOTO (MÁXIMA CALIDAD - ESCALA 3X) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
@@ -245,48 +289,5 @@ if (inputPostal) {
           cargarMuro(); 
 
         
-        }
       });
     }
-
-/* --------------------------------------------------------------
-   7. REPRODUCTOR DE MÚSICA
-   -------------------------------------------------------------- */
-let isPlaying = false;
-
-window.toggleMusic = function() {
-  const disco = document.getElementById('vinyl-disc');
-  const audio = document.getElementById('selva-audio');
-  const texto = document.getElementById('music-text');
-
-  if (!audio || !disco) return;
-
-  if (isPlaying) {
-    // PAUSA
-    audio.pause();
-    disco.classList.remove('disco-girando');
-    texto.innerText = "🎵 SONIDO SELVA";
-    texto.style.color = "white";
-    isPlaying = false;
-  } else {
-    // PLAY
-    // Giro visual inmediato
-    disco.classList.add('disco-girando');
-    texto.innerText = "⌛ CARGANDO...";
-    texto.style.color = "#F8B229";
-
-    audio.volume = 0.5;
-
-    audio.play()
-      .then(() => {
-        texto.innerText = "🎶 REPRODUCIENDO...";
-        isPlaying = true;
-      })
-      .catch(error => {
-        console.error(error);
-        disco.classList.remove('disco-girando');
-        texto.innerText = "❌ ERROR";
-        texto.style.color = "red";
-      });
-  }
-}
