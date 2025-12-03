@@ -190,7 +190,7 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD) ---
+// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD 2.5X) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
     if (btnPublicar) {
@@ -204,31 +204,33 @@ if (inputPostal) {
         btnPublicar.disabled = true;
 
         try {
-          // TRUCO DE CALIDAD:
-          // scale: 3 -> Significa que si el marco mide 300px, la foto saldrá de 900px (Super Nítida)
-          // Esto iguala la calidad de pantallas Retina/iPhone.
+          // DETECTAR DISPOSITIVO
+          const esCelular = window.innerWidth < 800;
           
+          // AJUSTES DE CALIDAD: Usamos 2.5x la resolución base para máxima nitidez en móvil.
+          const escala = esCelular ? 2.5 : 1.0; 
+
+          // PASO 2: TOMAR LA FOTO CON HTML2CANVAS
           const canvas = await html2canvas(marco, { 
-              scale: 3,  // <--- AQUÍ ESTÁ LA CLAVE (Antes era 0.6 o 1)
+              scale: escala, // <--- CAMBIO CRUCIAL PARA LA NITIDEZ
               useCORS: true, 
               logging: false,
               allowTaint: true,
               backgroundColor: null,
-              imageTimeout: 0 // Esperar lo necesario a que cargue la imagen
+              imageTimeout: 0
           });
 
-          // Compresión suave (0.9 = 90% Calidad)
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          // Compresión suave (0.95 para máxima calidad de color)
+          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
           btnPublicar.innerHTML = '☁️ Subiendo...';
 
-          // Subir a Storage
+          // SUBIR A STORAGE
           const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
           const referenciaStorage = ref(storage, nombreArchivo);
-          
           await uploadString(referenciaStorage, imagenBase64, 'data_url');
           
-          // Guardar Datos
+          // GUARDAR DATOS
           btnPublicar.innerHTML = '💾 Finalizando...';
           const urlPublica = await getDownloadURL(referenciaStorage);
 
@@ -241,8 +243,9 @@ if (inputPostal) {
           cargarMuro(); 
 
         } catch (error) {
-          console.error("Error:", error);
-          alert("Error al subir: " + error.message);
+          console.error("Error al subir:", error);
+          // Si falla, es por memoria. El código vuelve a habilitar el botón.
+          alert("⚠️ ¡Error! El navegador se quedó sin memoria (la foto es muy pesada). Intenta con una foto más pequeña.");
         } finally {
           btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;
