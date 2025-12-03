@@ -1766,3 +1766,24 @@ body::before {
   z-index: 20002 !important;
 }
 
+/* =========================================
+   AJUSTE DE CALIDAD Y PREVISUALIZACIÓN
+   ========================================= */
+
+/* 1. MEJORAR VISTA PREVIA DE CARGA (Para que no se vea cortada) */
+.marco-borde img {
+  /* Usamos 'contain' para mostrar la imagen COMPLETA sin cortarla,
+     permitiendo que el usuario vea exactamente qué subirá. */
+  object-fit: contain !important; 
+  height: auto !important;
+  max-height: 400px; /* Limitamos la altura en escritorio */
+}
+
+/* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
+#muro-marco {
+  /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
+  max-width: 700px !important; 
+  /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
+  /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
+}
+
