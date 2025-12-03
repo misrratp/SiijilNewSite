@@ -1779,11 +1779,30 @@ body::before {
   max-height: 400px; /* Limitamos la altura en escritorio */
 }
 
-/* 2. AUMENTAR EL TAMAÑO DEL CARRUSEL (MURO DE FOTOS) */
-#muro-marco {
-  /* Cambiamos el ancho máximo de 500px a 700px para que se luzca más */
-  max-width: 600px !important; 
-  /* Puedes ajustar el 'aspect-ratio' si quieres que la altura sea más pequeña o grande. */
-  /* Por ejemplo, 16/9 para un formato ancho. Lo dejamos en 4/5 que es un buen vertical. */
+/* =========================================
+   AJUSTE DE ALTURA DEFINITIVO (PARA QUE LA FOTO SEA GRANDE)
+   ========================================= */
+
+/* 1. Aseguramos que el riel ocupe el 100% de la altura total del marco */
+#muro-track {
+    height: 100% !important; 
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
+/* 2. Forzar que cada diapositiva ocupe el 100% de esa altura */
+#muro-track > div {
+    min-width: 100% !important;
+    height: 100% !important; /* LA CLAVE: Ocupar toda la altura disponible */
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative; 
+}
+
+/* 3. La imagen: Ocupa el 100% de su contenedor y cubre el espacio */
+#muro-track img {
+    object-fit: cover !important; 
+    width: 100% !important;
+    height: 100% !important; /* Estirar la imagen al 100% de la altura del slide */
+    vertical-align: middle !important; 
+}
