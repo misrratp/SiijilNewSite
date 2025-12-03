@@ -190,33 +190,17 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (ALTA CALIDAD OPTIMIZADA CON VALIDACIÓN) ---
+// --- FUNCIÓN 1: PUBLICAR FOTO (MÁXIMA CALIDAD - ESCALA 3X) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
-    // Obtenemos la imagen de vista previa (ya existía en el código, pero la declaramos aquí para el chequeo)
-    const imgVistaPrevia = document.getElementById('vista-previa-postal');
-
     if (btnPublicar) {
       btnPublicar.addEventListener('click', async () => {
-        
-        // ===============================================
-        //  NUEVA VALIDACIÓN: Bloquear si no hay foto cargada
-        // ===============================================
-        if (!imgVistaPrevia || 
-            imgVistaPrevia.src.includes('logo.svg') || 
-            imgVistaPrevia.src.includes('placeholder')) 
-        {
-             alert("⚠️ Por favor, selecciona una foto de tu galería antes de publicar.");
-             return; // Detiene la ejecución aquí
-        }
-        // ===============================================
-        
         const marco = document.querySelector('.marco-borde');
         
         if(!marco) return;
 
         const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
-        btnPublicar.innerHTML = '✨ Renderizando HD...';
+        btnPublicar.innerHTML = '✨ Renderizando 3X HD...';
         btnPublicar.disabled = true;
 
         try {
@@ -224,11 +208,12 @@ if (inputPostal) {
           const esCelular = window.innerWidth < 800;
           
           // AJUSTES DE CALIDAD MÁXIMA
-          const escala = esCelular ? 3 : 1.5; 
+          // Usamos escala 3 para igualar la densidad de píxeles de los teléfonos más modernos.
+          const escala = esCelular ? 3 : 1.5; // 1.5x en escritorio ya es un buen HD.
 
           // 1. TOMAR FOTO CON HTML2CANVAS
           const canvas = await html2canvas(marco, { 
-              scale: escala,
+              scale: escala, // <--- LA SOLUCIÓN FINAL PARA LA NITIDEZ
               useCORS: true, 
               logging: false,
               allowTaint: true,
@@ -256,12 +241,13 @@ if (inputPostal) {
             fecha: new Date()
           });
 
-          alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
+          alert("¡LISTO! La foto se subió en la mejor calidad posible 📸");
           cargarMuro(); 
 
         } catch (error) {
           console.error("Error al subir:", error);
-          alert("⚠️ ERROR: " + error.message + " (Intenta con una foto más pequeña).");
+          // Si falla, es por memoria. El código alerta al usuario.
+          alert("⚠️ ERROR: El navegador se quedó sin memoria (la foto original es muy pesada). Intenta con una foto más pequeña.");
         } finally {
           btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;
