@@ -1048,8 +1048,8 @@
           // CONFIGURACIÓN LIGERA
           // En celular usamos escala 0.6 (baja calidad pero rápido)
           // En compu usamos escala 1 (calidad normal)
-          const escala = esCelular ? 0.6 : 1;
-
+ const esCelular = window.innerWidth < 800;
+          const escala = esCelular ? 3 : 1.5; 
           // PASO 2: TOMAR LA FOTO (HTML2CANVAS)
           const canvas = await html2canvas(marco, { 
               scale: escala, 
@@ -1093,7 +1093,8 @@
         }
       });
     }
-// --- FUNCIÓN 2: CARGAR MURO Y ANIMAR ---
+
+    // --- FUNCIÓN 2: CARGAR MURO Y ANIMAR ---
     async function cargarMuro() {
       const track = document.getElementById('muro-track'); 
       const grid = document.getElementById('muro-contenedor');
@@ -1154,7 +1155,6 @@
 
     // Ejecutar al inicio
     cargarMuro();
-    
   </script>
 
 </body>
