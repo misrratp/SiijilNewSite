@@ -1594,3 +1594,150 @@ body::before {
 .btn-subir { background-color: #D42426; }
 .btn-descargar { background-color: #165B33; }
 .btn-borrar { background-color: #2C3E50; padding: 12px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+
+/.mascota-corner {
+  position: fixed;
+  bottom: -30px;
+  left: 20px;
+  width: 180px;
+  
+  /* ¡IMPORTANTE! Más alto que la nieve (9999) y que todo lo demás */
+  z-index: 20000 !important; 
+  
+  pointer-events: none; /* El cuadro es transparente a los clicks */
+  animation: peeking 4s ease-in-out infinite;
+}
+
+/* La imagen SÍ recibe clicks */
+.mascota-corner img {
+  pointer-events: auto !important; 
+  width: 100%;
+}
+
+/* =========================================
+   ARREGLO: CLIC EN MASCOTA
+   ========================================= */
+
+/* 1. Subimos la mascota por encima de la nieve */
+.mascota-corner {
+  z-index: 10001 !important; /* Más alto que la nieve (que era 9999) */
+  pointer-events: none;      /* El cuadro sigue siendo invisible al clic */
+}
+
+/* 2. Hacemos que la imagen SÍ reciba clics */
+.mascota-corner img {
+  pointer-events: auto !important; /* ¡ESTO ES LO IMPORTANTE! */
+  cursor: pointer;
+}
+
+/* 3. Aseguramos que la animación de enojo funcione */
+.mascota-enojada {
+  filter: sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 10px red) !important;
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both !important;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-5deg); }
+  20%, 80% { transform: translate3d(2px, 0, 0) rotate(5deg); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0) rotate(-5deg); }
+  40%, 60% { transform: translate3d(4px, 0, 0) rotate(5deg); }
+}
+
+/* =======================================================
+   ARREGLO DEL MENÚ MÓVIL (LOGO Y TACHA)
+   ======================================================= */
+
+/* -------------------------------------------------------
+   1. EN COMPUTADORA (Pantallas grandes)
+   ¡Ocultamos esa barra por completo!
+   ------------------------------------------------------- */
+@media (min-width: 992px) {
+  .navbar-top {
+    display: none !important; /* Desaparece el contenedor del logo móvil y la tacha */
+  }
+  
+  .nav-close-btn {
+    display: none !important; /* Aseguramos que el botón X tampoco salga */
+  }
+}
+
+/* -------------------------------------------------------
+   2. EN CELULAR (Pantallas pequeñas)
+   Aquí ordenamos el Logo a la Izquierda y la X a la derecha
+   ------------------------------------------------------- */
+@media (max-width: 991px) {
+
+  .navbar-top {
+    display: flex !important;           /* Usar Flexbox para alinear */
+    justify-content: space-between !important; /* Empuja elementos a los extremos */
+    align-items: center !important;     /* Los centra verticalmente */
+    width: 100% !important;
+    padding: 20px !important;           /* Espacio para que no se vea apretado */
+    border-bottom: 1px solid #eee;      /* Una línea sutil abajo */
+    background-color: #fff;             /* Fondo blanco limpio */
+  }
+
+  /* Controlamos el tamaño del Logo en el menú */
+  .navbar-top .logo img {
+    height: 50px !important; /* Ajusta este número si lo quieres más grande/chico */
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  /* Controlamos el tamaño y color de la Tacha (X) */
+  .nav-close-btn ion-icon {
+    font-size: 40px !important; /* Tamaño de la X */
+    color: #333 !important;     /* Color gris oscuro */
+    --ionicon-stroke-width: 40px;
+  }
+  
+  /* Efecto al tocar la X */
+  .nav-close-btn:active ion-icon {
+    color: red !important;
+  }
+}
+
+/* =========================================
+   ANIMACIÓN DEL TOCADISCOS (ARREGLO FINAL)
+   ========================================= */
+
+/* 1. EL BOTÓN DISCO BASE */
+#vinyl-disc {
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  /* Transición suave para cuando se agranda */
+  transition: transform 0.3s ease; 
+  /* Asegura que el centro se mantenga para girar bien */
+  transform-origin: center center;
+}
+
+/* 2. LA CLASE QUE ACTIVA EL GIRO */
+.disco-girando {
+  /* ¡Gira por siempre! */
+  animation: spin 4s linear infinite;
+}
+
+/* 3. LA DEFINICIÓN DEL GIRO */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 4. EL EFECTO DE "AGRANDAR" (HOVER) */
+/* TRUCO: Solo se agranda si NO tiene la clase .disco-girando */
+/* Esto evita que se trabe la animación al pasar el mouse o tocar */
+@media (hover: hover) {
+  #vinyl-disc:not(.disco-girando):hover {
+    transform: scale(1.1);
+  }
+}
+
+/* 5. LA IMAGEN */
+#vinyl-disc img {
+    pointer-events: auto; /* Para que detecte el clic en móviles */
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}

@@ -84,7 +84,7 @@
 
           <div class="navbar-top">
             <a href="#" class="logo">
-              <img src="./assets/images/logo-blue.svg" alt="Tourly logo">
+              <img src="./assets/images/logo-blue.png" alt="Tourly logo">
             </a>
             <button class="nav-close-btn" aria-label="Close Menu" data-nav-close-btn>
               <ion-icon name="close-outline"></ion-icon>
@@ -142,7 +142,29 @@
             <a href="#reservar" class="btn btn-secondary">Reserva ahora</a>
           </div>
 
+
+<div class="music-player-wrapper" style="margin-top: 40px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div id="vinyl-disc" onclick="toggleMusic()" title="¡Ponle ambiente a tu viaje!" style="width: 80px; height: 80px; cursor: pointer; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: transform 0.2s;">
+              <img src="https://vinyls.es/wp-content/uploads/vinilo-vinyls.png" alt="Play Vinyl" style="width: 100%; height: 100%; border-radius: 50%; display: block;">
+            </div>
+
+            <p id="music-text" style="color: white; font-size: 12px; margin-top: 15px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.8); letter-spacing: 1px; text-transform: uppercase;">
+              🎵 Musica Navideña
+            </p>
+
+            <audio id="selva-audio" loop>
+              <source src="./assets/audios/navidad.mp3" type="audio/mpeg">
+              
+              Tu navegador no soporta el elemento de audio.
+            </audio>
+
+          </div>
         </div>
+		
+		
+		
+		
       </section>
 
 
@@ -980,9 +1002,14 @@
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <div class="mascota-corner">
-    <img src="./assets/images/mascota-navidad.png" alt="Mi mascota ayudante de Santa">
-  </div>
-  
+    
+    <img id="mascota-img" src="./assets/images/mascota-navidad.png" alt="Mascota" onclick="hacerEnojar()" style="cursor: pointer;">
+
+    <audio id="sonido-enojo" preload="auto">
+  <source src="./assets/audios/enojo.mp3" type="audio/mpeg">
+</audio>
+
+    </div>
   
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   
@@ -1059,6 +1086,7 @@
     }
 
     // --- FUNCIÓN 2: CARGAR MURO Y ANIMAR (CARRUSEL) ---
+    // --- FUNCIÓN 2: CARGAR MURO Y ANIMAR (CON AUTO-CORRECCIÓN DE ERRORES) ---
     async function cargarMuro() {
       // OJO: Asegúrate de que en tu HTML tengas el div con id="muro-track"
       // Si usaste el código anterior que tenía "muro-contenedor", cámbialo aquí o en el HTML.
@@ -1077,7 +1105,8 @@
 
       contenedor.innerHTML = ''; 
 
-      const q = query(collection(db, "muro_navideno"), orderBy("fecha", "desc"), limit(10));
+      // Pedimos las últimas 20 fotos (pedimos más por si algunas están rotas y se borran)
+      const q = query(collection(db, "muro_navideno"), orderBy("fecha", "desc"), limit(20));
       const datos = await getDocs(q);
 
       if (datos.empty) {
@@ -1090,44 +1119,62 @@
         
         const elemento = document.createElement('div');
         
+        // TRUCO MÁGICO: Si la imagen falla al cargar, borra todo el div contenedor
+        const borrarSiFalla = "this.parentElement.remove()";
+
         if (esCarrusel) {
             // Estilo para Carrusel (Slide)
             elemento.style.minWidth = "100%";
             elemento.style.height = "100%";
             elemento.style.position = "relative";
             elemento.innerHTML = `
-              <img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="Foto">
+              <img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="Foto" onerror="${borrarSiFalla}">
               <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); color: white; padding: 5px; text-align: center;">🎄 Visitante ✨</div>
             `;
         } else {
             // Estilo para Grid (Cuadritos)
             elemento.style.cssText = "border-radius: 10px; overflow: hidden; border: 2px solid #D42426; height: 200px;";
-            elemento.innerHTML = `<img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            elemento.innerHTML = `<img src="${data.fotoUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="${borrarSiFalla}">`;
         }
         
         contenedor.appendChild(elemento);
       });
 
       if (esCarrusel) {
-          iniciarAnimacionMuro();
+          // Damos un pequeño respiro (500ms) para que se borren las imágenes rotas antes de calcular la animación
+          setTimeout(() => {
+             iniciarAnimacionMuro();
+          }, 500);
       }
     }
 
     function iniciarAnimacionMuro() {
+      // Limpiamos cualquier reloj anterior para evitar conflictos
       if (intervaloMuro) clearInterval(intervaloMuro);
+      
       const track = document.getElementById('muro-track');
       if(!track) return;
 
+      // Importante: Volvemos a contar los slides por si algunos se borraron
       const totalSlides = track.children.length;
       
       intervaloMuro = setInterval(() => {
         indiceMuro++;
-        if (indiceMuro >= totalSlides) indiceMuro = 0;
+        
+        // Si llegamos al final, volvemos al principio
+        if (indiceMuro >= totalSlides) {
+            indiceMuro = 0;
+        }
+        
+        // Movemos el riel
         track.style.transform = `translateX(${indiceMuro * -100}%)`;
       }, 3000);
     }
 
+    // Ejecutar al inicio
     cargarMuro();
+	
+	
 
   </script>
 
