@@ -1,34 +1,25 @@
-/*-----------------------------------*\
- * #style.css
-\*-----------------------------------*/
-
-/**
- * copyright 2022 codewithsadee
- */
-
-
 /* =========================================
-   ARREGLO URGENTE: EL MENÚ ENCIMA DE TODO
+   ARREGLO FINAL: FORZAR VISIBILIDAD DEL MENÚ
    ========================================= */
 
-.header {
-  position: relative; 
-  /* Ponemos un número exageradamente alto para ganarle a la nieve (9999) y a la barra (10000) */
-  z-index: 30000 !important; 
+@media (max-width: 991px) {
+  /* Cuando el menú tiene la clase 'active', ¡DEBE VERSE! */
+  .navbar.active {
+    right: 0 !important;             /* Lo trae a la pantalla */
+    visibility: visible !important;  /* Lo hace visible */
+    opacity: 1 !important;           /* Le quita transparencia */
+    display: block !important;       /* Asegura que ocupe espacio */
+    transform: none !important;      /* Quita transformaciones raras */
+    z-index: 9999999 !important;     /* Encima de la nieve y todo */
+  }
+  
+  /* Aseguramos que el fondo oscuro también salga */
+  .overlay.active {
+    display: block !important;
+    opacity: 1 !important;
+    z-index: 9999998 !important;
+  }
 }
-
-/* Aseguramos que el botón de menú sea tocable */
-.nav-open-btn {
-  position: relative;
-  z-index: 30001 !important;
-  cursor: pointer;
-}
-
-/* Aseguramos que el menú desplegado esté AÚN más arriba */
-.navbar, .navbar.active {
-  z-index: 30002 !important;
-}
-
 
 /*-----------------------------------*\
  * #CUSTOM PROPERTY
