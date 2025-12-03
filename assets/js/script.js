@@ -190,11 +190,27 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD 2.5X) ---
+// --- FUNCIÓN 1: PUBLICAR FOTO (ALTA CALIDAD OPTIMIZADA CON VALIDACIÓN) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
+    // Obtenemos la imagen de vista previa (ya existía en el código, pero la declaramos aquí para el chequeo)
+    const imgVistaPrevia = document.getElementById('vista-previa-postal');
+
     if (btnPublicar) {
       btnPublicar.addEventListener('click', async () => {
+        
+        // ===============================================
+        //  NUEVA VALIDACIÓN: Bloquear si no hay foto cargada
+        // ===============================================
+        if (!imgVistaPrevia || 
+            imgVistaPrevia.src.includes('logo.svg') || 
+            imgVistaPrevia.src.includes('placeholder')) 
+        {
+             alert("⚠️ Por favor, selecciona una foto de tu galería antes de publicar.");
+             return; // Detiene la ejecución aquí
+        }
+        // ===============================================
+        
         const marco = document.querySelector('.marco-borde');
         
         if(!marco) return;
@@ -207,12 +223,12 @@ if (inputPostal) {
           // DETECTAR DISPOSITIVO
           const esCelular = window.innerWidth < 800;
           
-          // AJUSTES DE CALIDAD: Usamos 2.5x la resolución base para máxima nitidez en móvil.
-          const escala = esCelular ? 2.5 : 1.0; 
+          // AJUSTES DE CALIDAD MÁXIMA
+          const escala = esCelular ? 3 : 1.5; 
 
-          // PASO 2: TOMAR LA FOTO CON HTML2CANVAS
+          // 1. TOMAR FOTO CON HTML2CANVAS
           const canvas = await html2canvas(marco, { 
-              scale: escala, // <--- CAMBIO CRUCIAL PARA LA NITIDEZ
+              scale: escala,
               useCORS: true, 
               logging: false,
               allowTaint: true,
@@ -225,12 +241,13 @@ if (inputPostal) {
 
           btnPublicar.innerHTML = '☁️ Subiendo...';
 
-          // SUBIR A STORAGE
+          // 2. SUBIR A STORAGE
           const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
           const referenciaStorage = ref(storage, nombreArchivo);
+          
           await uploadString(referenciaStorage, imagenBase64, 'data_url');
           
-          // GUARDAR DATOS
+          // 3. GUARDAR DATOS
           btnPublicar.innerHTML = '💾 Finalizando...';
           const urlPublica = await getDownloadURL(referenciaStorage);
 
@@ -244,8 +261,7 @@ if (inputPostal) {
 
         } catch (error) {
           console.error("Error al subir:", error);
-          // Si falla, es por memoria. El código vuelve a habilitar el botón.
-          alert("⚠️ ¡Error! El navegador se quedó sin memoria (la foto es muy pesada). Intenta con una foto más pequeña.");
+          alert("⚠️ ERROR: " + error.message + " (Intenta con una foto más pequeña).");
         } finally {
           btnPublicar.innerHTML = textoOriginal;
           btnPublicar.disabled = false;

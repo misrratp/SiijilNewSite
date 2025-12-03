@@ -1083,13 +1083,7 @@
           alert("¡LISTO! Tu postal ya está en el muro 🎉");
           cargarMuro(); 
 
-        } catch (error) {
-          console.error("Error al subir:", error);
-          // Esta alerta te dirá exactamente qué pasó
-          alert("ERROR: " + error.message + "\n\n(Intenta con una foto menos pesada)");
-        } finally {
-          btnPublicar.innerHTML = textoOriginal;
-          btnPublicar.disabled = false;
+        
         }
       });
     }
