@@ -1779,30 +1779,22 @@ body::before {
   max-height: 400px; /* Limitamos la altura en escritorio */
 }
 
-/* =========================================
-   AJUSTE DE ALTURA DEFINITIVO (PARA QUE LA FOTO SEA GRANDE)
-   ========================================= */
-
-/* 1. Aseguramos que el riel ocupe el 100% de la altura total del marco */
+/* AJUSTE DE ALTURA DEFINITIVO */
 #muro-track {
     height: 100% !important; 
     margin: 0 !important;
     padding: 0 !important;
 }
 
-/* 2. Forzar que cada diapositiva ocupe el 100% de esa altura */
 #muro-track > div {
-    min-width: 100% !important;
-    height: 100% !important; /* LA CLAVE: Ocupar toda la altura disponible */
-    margin: 0 !important;
+    height: 100% !important; 
     padding: 0 !important;
-    position: relative; 
+    margin: 0 !important;
 }
 
-/* 3. La imagen: Ocupa el 100% de su contenedor y cubre el espacio */
 #muro-track img {
+    /* Ocupa todo el espacio, sin dejar huecos */
     object-fit: cover !important; 
     width: 100% !important;
-    height: 100% !important; /* Estirar la imagen al 100% de la altura del slide */
-    vertical-align: middle !important; 
+    height: 100% !important;
 }
