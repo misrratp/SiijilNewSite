@@ -1,27 +1,46 @@
-
-
-// Activar botones del menú
-if (navOpenBtn && navbar) {
-  navToggleEvent(navElemArr);
-}
-
-// Cerrar menú al dar clic en un enlace
-for (let i = 0; i < navLinks.length; i++) {
-  navLinks[i].addEventListener("click", function () {
-    navbar.classList.remove("active");
-    overlay.classList.remove("active");
-    document.body.classList.remove("active");
-  });
-}
-
-
 /* ==============================================================
-   2. TIENDA Y CARRITO DE COMPRAS
+   SCRIPT PRINCIPAL - SÍIJIL NOH HÁ
    ============================================================== */
+
+/* --------------------------------------------------------------
+   1. MENÚ MÓVIL (Lógica Blindada)
+   -------------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // Solo se ejecuta cuando el HTML ya cargó por completo
+  const navOpenBtn = document.querySelector("[data-nav-open-btn]");
+  const navbar = document.querySelector("[data-navbar]");
+  const navCloseBtn = document.querySelector("[data-nav-close-btn]");
+  const overlay = document.querySelector("[data-overlay]");
+  const navLinks = document.querySelectorAll("[data-nav-link]");
+
+  function toggleNavbar() {
+    navbar.classList.toggle("active");
+    overlay.classList.toggle("active");
+    document.body.classList.toggle("active");
+  }
+
+  // Asignar clics de forma segura
+  if (navOpenBtn) navOpenBtn.onclick = toggleNavbar;
+  if (navCloseBtn) navCloseBtn.onclick = toggleNavbar;
+  if (overlay) overlay.onclick = toggleNavbar;
+
+  // Cerrar menú al tocar un enlace
+  navLinks.forEach(link => {
+    link.onclick = function() {
+      navbar.classList.remove("active");
+      overlay.classList.remove("active");
+      document.body.classList.remove("active");
+    };
+  });
+});
+
+
+/* --------------------------------------------------------------
+   2. TIENDA Y CARRITO
+   -------------------------------------------------------------- */
 let carrito = [];
 let total = 0;
 
-// Hacer funciones globales (window.) para que el HTML pueda usarlas
 window.agregarAlCarrito = function(producto, precio) {
   carrito.push({ producto, precio });
   total += precio;
@@ -54,7 +73,7 @@ window.finalizarCompraWhatsApp = function() {
   window.open(`https://wa.me/529838090970?text=${mensaje}`, '_blank');
 }
 
-/* --- Pasarela de Pago Falsa --- */
+/* Pasarela Falsa */
 window.abrirPasarela = function() {
   if (carrito.length === 0) { alert("Tu carrito está vacío."); return; }
   const modal = document.getElementById('modal-pago');
@@ -94,51 +113,37 @@ window.procesarPago = function(event) {
 }
 
 
-/* ==========================================
-   INTERACCIÓN: MASCOTA MOLESTA (CON SONIDO DIRECTO)
-   ========================================== */
-/* ==========================================
-   INTERACCIÓN: MASCOTA (MÉTODO HTML ESTABLE)
-   ========================================== */
+/* --------------------------------------------------------------
+   3. MASCOTA INTERACTIVA
+   -------------------------------------------------------------- */
 window.hacerEnojar = function() {
   const mascota = document.getElementById('mascota-img');
   const audio = document.getElementById('sonido-enojo');
   
   if (!mascota) return;
-
-  // Si ya está enojada, no hacemos nada
   if (mascota.classList.contains('mascota-enojada')) return;
 
-  // 1. INTENTAR SONIDO
+  // Sonido
   if (audio) {
     audio.volume = 1.0;
-    audio.currentTime = 0; // Reiniciar por si le das clic seguido
-    
-    // Promesa para evitar errores si el navegador bloquea
+    audio.currentTime = 0; 
     var promesa = audio.play();
     if (promesa !== undefined) {
-        promesa.catch(error => {
-            console.log("Error de audio:", error);
-            // Si falla, no pasa nada, solo no suena, pero no rompe la página
-        });
+        promesa.catch(error => console.log("Audio bloqueado:", error));
     }
-  } else {
-      alert("Error: No encuentro la etiqueta <audio id='sonido-enojo'> en el HTML");
   }
 
-  // 2. ANIMACIÓN
+  // Animación
   mascota.classList.add('mascota-enojada');
-
-  // 3. QUITAR ENOJO
   setTimeout(() => {
     mascota.classList.remove('mascota-enojada');
   }, 500);
 }
 
 
-/* ==============================================================
+/* --------------------------------------------------------------
    4. EFECTO DE NIEVE
-   ============================================================== */
+   -------------------------------------------------------------- */
 function createSnowflake() {
   const snowflake = document.createElement('div');
   snowflake.classList.add('snowflake');
@@ -150,12 +155,13 @@ function createSnowflake() {
   document.body.appendChild(snowflake);
   setTimeout(() => { snowflake.remove(); }, 5000);
 }
+// Iniciamos la nieve
 setInterval(createSnowflake, 200);
 
 
-/* ==============================================================
-   5. SLIDER AUTOMÁTICO DE NOVEDADES
-   ============================================================== */
+/* --------------------------------------------------------------
+   5. SLIDER DE NOVEDADES
+   -------------------------------------------------------------- */
 const trackNovedades = document.querySelector('.slider-track');
 const slidesNovedades = document.querySelectorAll('.slide');
 let indexSlider = 0;
@@ -169,13 +175,12 @@ function moverSlider() {
 if (slidesNovedades.length > 0) setInterval(moverSlider, 4000);
 
 
-/* ==============================================================
-   6. POSTAL NAVIDEÑA (Generar Imagen)
-   ============================================================== */
+/* --------------------------------------------------------------
+   6. POSTAL NAVIDEÑA
+   -------------------------------------------------------------- */
 const inputPostal = document.getElementById('input-postal');
 const imgVistaPrevia = document.getElementById('vista-previa-postal');
 
-// Subir foto al marco
 if (inputPostal) {
   inputPostal.addEventListener('change', function(event) {
     const archivo = event.target.files[0];
@@ -185,40 +190,69 @@ if (inputPostal) {
   });
 }
 
-// Borrar foto del marco
-// Borrar foto del marco
-window.borrarFoto = function() {
-  if (imgVistaPrevia) {
-    // Regresamos al logo local en lugar del link roto
-    imgVistaPrevia.src = "./assets/images/logo.svg"; 
-  }
-  if (inputPostal) inputPostal.value = ""; 
-}
+// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD) ---
+    const btnPublicar = document.getElementById('btn-publicar');
+    
+    if (btnPublicar) {
+      btnPublicar.addEventListener('click', async () => {
+        const marco = document.querySelector('.marco-borde');
+        
+        if(!marco) return;
 
-// Descargar postal como imagen
-window.descargarPostal = function() {
-  const marco = document.querySelector('.marco-borde');
-  if (!marco || typeof html2canvas === 'undefined') {
-    console.error("Falta el elemento marco o la librería html2canvas");
-    return;
-  }
-  
-  // Cambiamos el texto del botón temporalmente
-  const btn = document.querySelector('.btn-descargar');
-  if(btn) btn.innerHTML = '<ion-icon name="hourglass-outline"></ion-icon> ...';
+        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
+        btnPublicar.innerHTML = '✨ Renderizando HD...';
+        btnPublicar.disabled = true;
 
-  html2canvas(marco, { scale: 2, useCORS: true }).then(canvas => {
-    const enlace = document.createElement('a');
-    enlace.download = 'Mi-Postal-Siijil.png';
-    enlace.href = canvas.toDataURL('image/png');
-    enlace.click();
-    if(btn) btn.innerHTML = '<ion-icon name="download-outline"></ion-icon> Descargar';
-  });
-}
+        try {
+          // TRUCO DE CALIDAD:
+          // scale: 3 -> Significa que si el marco mide 300px, la foto saldrá de 900px (Super Nítida)
+          // Esto iguala la calidad de pantallas Retina/iPhone.
+          
+          const canvas = await html2canvas(marco, { 
+              scale: 3,  // <--- AQUÍ ESTÁ LA CLAVE (Antes era 0.6 o 1)
+              useCORS: true, 
+              logging: false,
+              allowTaint: true,
+              backgroundColor: null,
+              imageTimeout: 0 // Esperar lo necesario a que cargue la imagen
+          });
 
-/* ==========================================
-   REPRODUCTOR (Giro Inmediato + Volumen)
-   ========================================== */
+          // Compresión suave (0.9 = 90% Calidad)
+          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+          btnPublicar.innerHTML = '☁️ Subiendo...';
+
+          // Subir a Storage
+          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
+          const referenciaStorage = ref(storage, nombreArchivo);
+          
+          await uploadString(referenciaStorage, imagenBase64, 'data_url');
+          
+          // Guardar Datos
+          btnPublicar.innerHTML = '💾 Finalizando...';
+          const urlPublica = await getDownloadURL(referenciaStorage);
+
+          await addDoc(collection(db, "muro_navideno"), {
+            fotoUrl: urlPublica,
+            fecha: new Date()
+          });
+
+          alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
+          cargarMuro(); 
+
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error al subir: " + error.message);
+        } finally {
+          btnPublicar.innerHTML = textoOriginal;
+          btnPublicar.disabled = false;
+        }
+      });
+    }
+
+/* --------------------------------------------------------------
+   7. REPRODUCTOR DE MÚSICA
+   -------------------------------------------------------------- */
 let isPlaying = false;
 
 window.toggleMusic = function() {
@@ -229,24 +263,21 @@ window.toggleMusic = function() {
   if (!audio || !disco) return;
 
   if (isPlaying) {
-    // PAUSAR
+    // PAUSA
     audio.pause();
     disco.classList.remove('disco-girando');
     texto.innerText = "🎵 SONIDO SELVA";
     texto.style.color = "white";
     isPlaying = false;
   } else {
-    // REPRODUCIR
-    
-    // 1. Gira visualmente YA (sin esperar)
+    // PLAY
+    // Giro visual inmediato
     disco.classList.add('disco-girando');
     texto.innerText = "⌛ CARGANDO...";
     texto.style.color = "#F8B229";
 
-    // 2. Ajustar Volumen (50%)
     audio.volume = 0.5;
 
-    // 3. Play al audio
     audio.play()
       .then(() => {
         texto.innerText = "🎶 REPRODUCIENDO...";
@@ -254,61 +285,9 @@ window.toggleMusic = function() {
       })
       .catch(error => {
         console.error(error);
-        // Si falla, deja de girar
         disco.classList.remove('disco-girando');
         texto.innerText = "❌ ERROR";
         texto.style.color = "red";
       });
   }
 }
-/* ==============================================================
-   1. LÓGICA DEL MENÚ MÓVIL (MENÚ DE EMERGENCIA INTEGRADO)
-   ============================================================== */
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("Iniciando Menú desde script.js...");
-
-  const navOpenBtn = document.querySelector("[data-nav-open-btn]");
-  const navbar = document.querySelector("[data-navbar]");
-  const navCloseBtn = document.querySelector("[data-nav-close-btn]");
-  const overlay = document.querySelector("[data-overlay]");
-  const navLinks = document.querySelectorAll("[data-nav-link]");
-
-  function toggleNavbar() {
-    // Forzamos las clases
-    navbar.classList.toggle("active");
-    overlay.classList.toggle("active");
-    document.body.classList.toggle("active");
-  }
-
-  // Asignar clic al botón de abrir
-  if (navOpenBtn) {
-    navOpenBtn.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Asignar clic al botón de cerrar
-  if (navCloseBtn) {
-    navCloseBtn.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Asignar clic al fondo oscuro
-  if (overlay) {
-    overlay.onclick = function() {
-      toggleNavbar();
-    };
-  }
-
-  // Cerrar al dar clic en enlaces
-  navLinks.forEach(link => {
-    link.onclick = function() {
-      navbar.classList.remove("active");
-      overlay.classList.remove("active");
-      document.body.classList.remove("active");
-    };
-  });
-});
-
-/* ... AQUÍ SIGUE EL RESTO DE TU CÓDIGO (Carrito, Música, Firebase, etc.) ... */
