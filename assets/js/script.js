@@ -190,65 +190,6 @@ if (inputPostal) {
   });
 }
 
-// --- FUNCIÓN 1: PUBLICAR FOTO (CALIDAD ULTRA HD) ---
-    const btnPublicar = document.getElementById('btn-publicar');
-    
-    if (btnPublicar) {
-      btnPublicar.addEventListener('click', async () => {
-        const marco = document.querySelector('.marco-borde');
-        
-        if(!marco) return;
-
-        const textoOriginal = '<ion-icon name="cloud-upload"></ion-icon> Publicar';
-        btnPublicar.innerHTML = '✨ Renderizando HD...';
-        btnPublicar.disabled = true;
-
-        try {
-          // TRUCO DE CALIDAD:
-          // scale: 3 -> Significa que si el marco mide 300px, la foto saldrá de 900px (Super Nítida)
-          // Esto iguala la calidad de pantallas Retina/iPhone.
-          
-          const canvas = await html2canvas(marco, { 
-              scale: 3,  // <--- AQUÍ ESTÁ LA CLAVE (Antes era 0.6 o 1)
-              useCORS: true, 
-              logging: false,
-              allowTaint: true,
-              backgroundColor: null,
-              imageTimeout: 0 // Esperar lo necesario a que cargue la imagen
-          });
-
-          // Compresión suave (0.9 = 90% Calidad)
-          const imagenBase64 = canvas.toDataURL('image/jpeg', 0.9);
-
-          btnPublicar.innerHTML = '☁️ Subiendo...';
-
-          // Subir a Storage
-          const nombreArchivo = `postales/postal_HD_${Date.now()}.jpg`;
-          const referenciaStorage = ref(storage, nombreArchivo);
-          
-          await uploadString(referenciaStorage, imagenBase64, 'data_url');
-          
-          // Guardar Datos
-          btnPublicar.innerHTML = '💾 Finalizando...';
-          const urlPublica = await getDownloadURL(referenciaStorage);
-
-          await addDoc(collection(db, "muro_navideno"), {
-            fotoUrl: urlPublica,
-            fecha: new Date()
-          });
-
-          alert("¡LISTO! Tu postal se subió en Alta Definición 📸");
-          cargarMuro(); 
-
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Error al subir: " + error.message);
-        } finally {
-          btnPublicar.innerHTML = textoOriginal;
-          btnPublicar.disabled = false;
-        }
-      });
-    }
 
 /* --------------------------------------------------------------
    7. REPRODUCTOR DE MÚSICA
