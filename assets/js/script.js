@@ -190,50 +190,6 @@ if (inputPostal) {
   });
 }
 
-
-
-/* --------------------------------------------------------------
-   7. REPRODUCTOR DE MÚSICA
-   -------------------------------------------------------------- */
-let isPlaying = false;
-
-window.toggleMusic = function() {
-  const disco = document.getElementById('vinyl-disc');
-  const audio = document.getElementById('selva-audio');
-  const texto = document.getElementById('music-text');
-
-  if (!audio || !disco) return;
-
-  if (isPlaying) {
-    // PAUSA
-    audio.pause();
-    disco.classList.remove('disco-girando');
-    texto.innerText = "🎵 SONIDO SELVA";
-    texto.style.color = "white";
-    isPlaying = false;
-  } else {
-    // PLAY
-    // Giro visual inmediato
-    disco.classList.add('disco-girando');
-    texto.innerText = "⌛ CARGANDO...";
-    texto.style.color = "#F8B229";
-
-    audio.volume = 0.5;
-
-    audio.play()
-      .then(() => {
-        texto.innerText = "🎶 REPRODUCIENDO...";
-        isPlaying = true;
-      })
-      .catch(error => {
-        console.error(error);
-        disco.classList.remove('disco-girando');
-        texto.innerText = "❌ ERROR";
-        texto.style.color = "red";
-      });
-  }
-}
-
 // --- FUNCIÓN 1: PUBLICAR FOTO (MÁXIMA CALIDAD - ESCALA 3X) ---
     const btnPublicar = document.getElementById('btn-publicar');
     
@@ -288,6 +244,54 @@ window.toggleMusic = function() {
           alert("¡LISTO! La foto se subió en la mejor calidad posible 📸");
           cargarMuro(); 
 
-        
+        } catch (error) {
+          console.error("Error al subir:", error);
+          // Si falla, es por memoria. El código alerta al usuario.
+          alert("⚠️ ERROR: El navegador se quedó sin memoria (la foto original es muy pesada). Intenta con una foto más pequeña.");
+        } finally {
+          btnPublicar.innerHTML = textoOriginal;
+          btnPublicar.disabled = false;
+        }
       });
     }
+/* --------------------------------------------------------------
+   7. REPRODUCTOR DE MÚSICA
+   -------------------------------------------------------------- */
+let isPlaying = false;
+
+window.toggleMusic = function() {
+  const disco = document.getElementById('vinyl-disc');
+  const audio = document.getElementById('selva-audio');
+  const texto = document.getElementById('music-text');
+
+  if (!audio || !disco) return;
+
+  if (isPlaying) {
+    // PAUSA
+    audio.pause();
+    disco.classList.remove('disco-girando');
+    texto.innerText = "🎵 SONIDO SELVA";
+    texto.style.color = "white";
+    isPlaying = false;
+  } else {
+    // PLAY
+    // Giro visual inmediato
+    disco.classList.add('disco-girando');
+    texto.innerText = "⌛ CARGANDO...";
+    texto.style.color = "#F8B229";
+
+    audio.volume = 0.5;
+
+    audio.play()
+      .then(() => {
+        texto.innerText = "🎶 REPRODUCIENDO...";
+        isPlaying = true;
+      })
+      .catch(error => {
+        console.error(error);
+        disco.classList.remove('disco-girando');
+        texto.innerText = "❌ ERROR";
+        texto.style.color = "red";
+      });
+  }
+}
